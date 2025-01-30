@@ -1,0 +1,30 @@
+---
+title: "CS4099 - Wii over IP"
+author: "Kieran Fowlds - 210018092"
+format:
+  revealjs:
+    incremental: true
+    theme: dark 
+standalone: true
+embed-resources: true
+---
+
+## Problem and Motivation 
+
+- 
+
+## What I have done so far
+
+- 
+
+## What still needs to be done
+
+- 
+    ::: {.notes}
+    This is a note
+    :::
+
+
+<!-- ![](logging_output.png) -->
+
+# Questions?
