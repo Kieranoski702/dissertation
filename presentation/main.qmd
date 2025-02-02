@@ -1,5 +1,5 @@
 ---
-title: "CS4099 - Wii over IP"
+title: "CS4099 - Wii over IP - Interim Demo"
 author: "Kieran Fowlds - 210018092"
 format:
   revealjs:
@@ -11,18 +11,33 @@ embed-resources: true
 
 ## Problem and Motivation 
 
-- 
+- The Nintendo Wii remains a beloved console due to its innovative motion controls and engaging local multiplayer experiences.
+- However, modern gaming has shifted toward online play, making it difficult to recreate traditional in-person multiplayer sessions.
+- Gathering physically for split-screen Wii gaming poses logistical challenges in today's era of remote connectivity.
+- This project aims to virtualise the Wii’s input and output interfaces, enabling remote players to experience local multiplayer as if they were in the same room.
+
+## Main challenges
+
+- The two core challenges:
+    - Low-latency video/audio streaming to ensure smooth and synchronised gameplay.
+    - Wiimote input relay over a network, preserving motion-based controls with minimal delay.
+- Successfully implementing this system will extend the lifespan of the Wii and offer a model for virtualising other retro multiplayer experiences
 
 ## What I have done so far
 
-- 
+- Written scripts that allow for low latency video streaming of the Wii display to other raspberry pis
+- Setup the raspberry pis to interface with the Wiimote so that it can act as a mouse and keyboard input
+- Researched and configured a Wii remote emulator so that the host pi can emulate remote pi Wii remote inputs
 
 ## What still needs to be done
 
-- 
-    ::: {.notes}
-    This is a note
-    :::
+- Test and possibly fix the latency of the Wii remote emulator as it currently looks like it will be the largest bottleneck for low latency performance
+- Write a program that can connect all the pieces together. We need to send the Wii remote inputs from remote pis to the host pi then translate those inputs into emulated Wii remote inputs
+- Scientifically evaluate the latency and "playability" of the system
+
+::: {.notes}
+This is a note
+:::
 
 
 <!-- ![](logging_output.png) -->
