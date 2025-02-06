@@ -1,0 +1,38 @@
+\chapter{Initial Plan from the Semester 1 Final Report}
+\label{appendix:plan-d2-semester1}
+
+As mentioned in the overview, the main goal of the project is to develop Rust
+native interfaces for each of the constraint solvers in order to increase the
+performance of the Conjure stack by removing the reliance on plain text
+communication between each part of the stack and using simple library calls
+instead of spawning multiple processes. My general plan for the semester was to
+learn more about Conjure and Rust, create the foreign function interface
+bindings for Chuffed, and then use those FFI bindings to create some Rust
+native interface for Chuffed so that it could be used in the wider conjure
+oxide stack. The general marker of success was creating a Rust native interface
+capable of solving the XYZ problem which is discussed more in detail later in
+this report.
+
+
+\section{Conjure Stack Redesign}
+
+Figure \ref{fig:existing-tech-stack} illustrates the current tech stack, while Figure \ref{fig:new-tech-stack} presents the
+proposed new stack. The new stack eliminates the necessity for plain text data
+exchange, bypasses intermediaries like Savile Row, and offers a more user and
+developer-friendly structure. This new stack is expected to significantly
+enhance performance, streamline the system by employing a single programming
+language, and provide consistent documentation and testing.
+
+\begin{figure}
+	\centering
+	\includegraphics{figures/existing_tech_stack.PNG}
+	\caption{Existing Tech Stack}
+	\label{fig:existing-tech-stack}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics{figures/new_tech_stack.PNG}
+	\caption{New Tech Stack}
+	\label{fig:new-tech-stack}
+\end{figure}

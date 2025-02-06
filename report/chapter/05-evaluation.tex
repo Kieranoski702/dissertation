@@ -1,0 +1,199 @@
+\mychapter{4}{Evaluation}
+\label{chapter:evaluation}
+
+\section{Justification}
+
+As mentioned in the \nameref{sec:areas-for-improvement} section of the
+\nameref{chapter:rewriter} chapter, there are quite a few areas for improvement
+in the rewriter. The main issue that I have been trying to solve this semester
+is that the rewriter will perform wasted work as it will check already finished
+branches to see if it can apply rules to the expressions in those branches. We believed
+that the rewriting algorithm could be improved by reducing the amount of rule application
+attempts that are made so I set out to optimise the rewriter in this regard.
+
+\section{Expression Metadata}
+
+Firstly, in order to implement the optimisation, we needed sine way to encode
+extra information into each expression so we can store a "clean" flag. After
+discussing with the Rust team, we decided we could create a metadata struct
+that each node would contain which allows us to encode any extra information
+we need - not just a "clean" flag. This is explained further in
+\hyperfootnote[issue
+	182]{https://}{www.github.com/conjure-cp/conjure-oxide/issues/182}.
+
+As discussed
+in the issue, I originally planned for the metadata to be “polymorphic” in the
+sense that it would change depending on the stage of the program. For example,
+the clean/dirty flag would be present in the metadata during rewriting but
+would not be present before or after this stage. This would reduce confusion in
+both developer and users of conjure-oxide as any debug information or printed
+output would only contain metadata that was relevant to that stage of
+execution. However, I spent a long time trying to implement this specifically
+as a Metadata trait which would be implemented by different metadata structs
+for different stages of the program but this caused a lot of issues with Rust’s
+type system due to all of the conversion between metadata structs. After
+discussing the issues with the rest of the Rust team, we decided that a simple
+Metadata struct that was not polymorphic would be good enough for our use case
+with the benefit of being much simpler. This struct will hold the metadata
+required for every stage if the program but currently only holds a clean
+boolean. The initial implementation of the Metadata struct as well as the first
+use of it within the Expression enum variant Constant can be found in
+\hyperfootnote[pull request
+	222]{https://}{www.github.com/conjure-cp/conjure-oxide/pull/222}. After this
+was implemented, I was able to use this metadata to implement the optimisation.
+
+\section{Implementation}
+
+The initial design for the optimisation is outlined in
+\hyperfootnote[issue
+	149]{https://}{www.github.com/conjure-cp/conjure-oxide/issues/149} and adds
+these steps to the rewriting algorithm:
+
+\begin{itemize}
+	\item When we visit an Expression in the expression tree, mark it as "clean"
+	\item When we apply a rule to an expression, mark it and all of its ancestors as "dirty"
+	\item Only try applying rules to a given node if it is "dirty", otherwise skip it
+\end{itemize}
+
+This works because if we have already found that no rules can be applied to an
+expression, this will still be the case for as long as this expression doesn't
+change (so we don't need to retry this check multiple times). However, if its
+sub-expressions have been changed, we need to check whether any new rules can
+now be applied to the expression (and all its parents)
+
+My implementation of this optimisation can be found in \hyperfootnote[pull request
+	287]{https://}{www.github.com/conjure-cp/conjure-oxide/pull/287}. As mentioned in the
+edit of this pull request, there were bugs in this implementation that led to me
+thinking it was working but the design of this implementation is flawed. After
+numerous debugging and discussion sessions with Ozgur we simplified the design of the
+optimisation to the following:
+
+\begin{itemize}
+	\item All expressions start as "dirty"
+	\item If no rules can be applied to the current expressions and if all the
+	      children of the current expression are "clean" (or it has no children) then
+	      the current expression is marked as "clean"
+\end{itemize}
+
+This avoids a few issues that the first design and implementation had:
+\begin{enumerate}
+	\item The first design would mark any expression as "clean" when it was first visited. This would cause
+	      problems where if the expression was not properly made "dirty" again then the rewriter would skip
+	      it when it should not have.
+	\item The first design had to mark all ancestors of a dirty expression as
+	      dirty as well. This is no longer necessary as if an expression is ever
+	      marked as "clean" then it should never be marked as "dirty" again and
+	      nothing should change it. Thus, the parent does not have to worry about if
+	      its children are dirty, only if they are clean.
+\end{enumerate}
+
+This new design was implemented in \hyperfootnote[pull request
+	292]{https://}{www.github.com/conjure-cp/conjure-oxide/pull/292} and now works
+better than the previous implementation. There does seem to be a few issues that
+are highlighted in the pull request but I will list them here as well:
+
+\begin{enumerate}
+	\item The number of rule application attempts for the optimised version of 1
+	      disjunct between xyz problems is higher than without optimisation (1352 vs
+	      1222)
+	\item The number of rule application attempts for the optimised versions of
+	      the other disjunct amounts is lower as expected however, it still grows
+	      higher than I would expect. For example, I would expect 2 disjunct to have
+	      around double the amount of rule applications but around 10x (10114
+	      attempts)
+	\item The run time for the optimised versions is around 3x that of the
+	      unoptimised versions which seems incorrect
+\end{enumerate}
+
+As of writing this report, I have not had time to fix these issues but there is a chance
+that by the time of your reading that there have been updates to this pull request so
+I would recommend checking the pull request for the most up-to-date information.
+
+\section{Results}
+
+Despite the issues mentioned in the previous section, the optimisation does seem to work in terms
+of reducing the amount of rule applications that are attempted. However, the results shown also
+indicate the issues mentioned previously.
+
+\begin{table}
+	\centering
+	\begin{tabularx}{0.8\textwidth} {
+			| >{\raggedright\arraybackslash}X
+			| >{\centering\arraybackslash}X
+			| >{\raggedleft\arraybackslash}X |}
+		\hline
+		Number of disjuncts & Number of rule application attempts without optimisation & Number of rule application attempts with optimisation \\
+		\hline
+		1                   & 1222                                                     & 1352                                                  \\
+		\hline
+		2                   & 24882                                                    & 10114                                                 \\
+		\hline
+		3                   & 423618                                                   & 41938                                                 \\
+		\hline
+		4                   & 5766722                                                  & 157690                                                \\
+		\hline
+	\end{tabularx}
+	\caption{Number of rule application attempts - Optimised vs Non-Optimised}
+	\label{tab:1}
+\end{table}
+
+Table \ref{tab:1} shows the number of rule application attempts for the optimised
+and non-optimised versions of the rewriter for different numbers of disjuncts.
+As you can see, the optimised version does reduce the number of rule
+applications that are attempted but as mentioned previously, the optimised
+version with 1 disjunct actually has more rule applications than the
+non-optimised version. Additionally, the number of rule applications for the
+optimised versions of the other disjunct amounts grows higher than expected.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{figures/rule_application_savings.png}
+	\caption{Rule Application Attempt Savings between Optimised and Unoptimised Versions}
+	\label{fig:rule-application-savings}
+\end{figure}
+
+Figure \ref{fig:rule-application-savings} shows the savings in rule application
+attempts between the optimised and non-optimised versions of the rewriter. That is
+to say, $(unoptimised\_rule\_applications - optimised\_rule\_applications)
+	/ unoptimised\_rule\_applications
+	* 100$. As you can see, there are quite significant savings past 1 disjunct.
+However, I am not fully convinced that this result is correct as discussed
+previously so please keep in mind that this is probably not representative of
+the actual savings that can be made. This is shown here to show the results of
+the optimisation in its current flawed state.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{figures/performance_gain.png}
+	\caption{Performance Gain between Optimised and Unoptimised Versions}
+	\label{fig:performance-gain}
+\end{figure}
+
+Figure \ref{fig:performance-gain} shows the performance gain between the
+optimised and non-optimised versions of the rewriter. This is calculated by
+$(unoptimised\_time - optimised\_time) / unoptimised\_time * 100$. As you can
+see, there is not an overall gain in performance when using the optimised
+version but a loss! The amount of performance lost does decrease as the number
+of disjuncts increases however which is a gain being measured here.  As
+mentioned previously, this is not the expected result and is likely due to a
+problem with this implementation. When the issues are fixed, I would expect to
+see a gain in performance. This is shown here to show the results of the
+optimisation in its current flawed state.
+
+Overall, it is clear to see that the optimisation still needs to be worked on
+in order to achieve the expected results. However, this version is much more promising
+than the initial broken version as that did not show any changes at all. I will
+continue to work on this optimisation in the future to try and achieve the
+expected results.
+
+\section{Learning Outcomes}
+
+I have learned a lot from this optimisation project - mainly in how to deal
+with changing requirements and how to deal with a flawed design. I have learned
+that it is important to be able to admit that our initial design was wrong and
+begin working on a new version with hesitation. It can be easy to get stuck in
+the mindset that the initial design has to be used because a redesign is both
+time-consuming and difficult. Avoiding this trap has allowed me to make significant
+progress on the optimisation despite the issues that have been faced. Additionally,
+I have learned even more about Rust programming and how to use features of
+the language to my advantage.

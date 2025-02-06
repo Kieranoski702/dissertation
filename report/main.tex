@@ -1,0 +1,142 @@
+\documentclass[abstract=true,headings=standardclasses,titlepage=false]{scrreprt}
+\KOMAoption{toc}{bibliography,listof,chapterentrywithdots}
+\KOMAoption{chapterprefix}{false}
+\KOMAoption{parskip}{half-}
+\usepackage[a4paper]{geometry}
+\usepackage{nameref}
+\usepackage[shortlabels]{enumitem}
+\usepackage{pdfpages}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[export]{adjustbox}
+\usepackage{xcolor}
+\usepackage{soul}
+
+%TC:fileinclude \import dir,file
+\usepackage{import}
+
+\usepackage{charter}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge -q -inc #1.tex output.bbl > #1-words.sum }%
+  \input{#1-words.sum}words%
+}
+
+% Command for making a chapter where the number does not appear in the title or
+% the table of contents but it's sections and subsections will use the number
+% given as an arguement to `\mychapter` in the table of contents
+\newcommand{\mychapter}[2]{
+    \setcounter{chapter}{#1}
+    \setcounter{section}{0}
+    \chapter*{#2}
+    \addcontentsline{toc}{chapter}{#2}
+}
+
+\usepackage[section]{placeins}
+
+% Required for inserting images
+\usepackage{graphicx} 
+
+% Citations
+\usepackage[british]{babel}
+\usepackage{biblatex}[style=numeric] %Imports biblatex package
+\usepackage{csquotes}
+\addbibresource{references.bib} %Import the bibliography file
+
+\usepackage{tabularx}
+% Links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=blue,
+    urlcolor=blue}
+
+% Make clickable link text with clickable link footnote with nicer formatting
+%
+% \hyperfootnote[My website]{https://}{www.mywebsite.com}
+% This creates a clickable piece of text in the text (‘My website’) plus a
+% footnote consisting of a clickable URL without the prefix (in this case
+% ‘https://’). Upon clicking it, however, you are directed to the full link,
+% i.e. ‘https://www.mywebsite.com’.
+\newcommand{\hyperfootnote}[3][]{\href{#2#3}{#1}\footnote{\href{#2#3}{#3}}}
+
+\definecolor{codebg}{gray}{0.95}
+\definecolor{codeframe}{gray}{0.8}
+
+% Highlight text in \texttt 
+\let\OldTexttt\texttt
+\renewcommand{\texttt}[1]{\fcolorbox{codeframe}{codebg}{\small\!\OldTexttt{#1}\!}}
+    
+\graphicspath{{figures/}}
+\title{CS4201 - Practical 2 - Intermediate Representations}
+\author{210018092}
+\date{20th November 2024}
+
+
+
+\begin{document}
+%TC:ignore
+\pagenumbering{roman}
+\maketitle
+\thispagestyle{empty}
+\vfill
+\begin{center}
+	\includegraphics[width=0.6\linewidth]{figures/logo.png}
+\end{center}
+
+\newpage
+\setcounter{page}{1}
+
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+%TC:endignore
+
+\import{chapter}{01-overview.tex}
+\import{chapter}{02-design-and-impl.tex}
+\import{chapter}{04-testing.tex}
+\import{chapter}{05-evaluation2.tex}
+\import{chapter}{06-conclusion.tex}
+
+\printbibliography[title=References]
+% \listoffigures
+% \listoftables
+
+
+% \appendix
+% \import{appendicies}{plan-d1-sem2.tex}
+% \import{appendicies}{plan-d2-sem1.tex}
+
+\end{document}

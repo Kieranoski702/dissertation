@@ -1,0 +1,41 @@
+\chapter{Plan and Objectives from the Semester 2 Mid-Semester Report}
+\label{appendix:plan-d1-semester2}
+
+\section{Plan}
+On a high level, I plan to continue developing the rewriter/the “rewriting
+engine”. This will involve implementing the clean/dirty flag and using it to
+optimise the rewriting algorithm, this will require metadata within all
+Expression nodes. Additionally, I plan to add warning messages, tracing and a
+debug mode to the rewriter as described in \hyperfootnote[this
+issue]{https://}{www.github.com/conjure-cp/conjure-oxide/issues/181}. There are
+also many more optimisations that can be made to the rewriter past the simple
+clean/dirty flag optimisation. I plan to research more optimisation techniques,
+particularly those found within Savile Row, and implement them for the
+rewriter.
+
+It will also be necessary to work on features of the rewriter that are
+requested by other members of the rust team. For example, there may be a need
+to look at the parents of Expression nodes in order to properly apply rules
+that need extra context. I plan to work on these features as they are requested
+by the rest of the Rust team. I also plan to continue working on the
+documentation for the rewriter and the rest of the Rust code base.
+\subsection{Primary objectives}
+\begin{itemize}
+    
+    \item Implement metadata and add it to all Expression variants
+    \item Implement the clean/dirty flag and use it to optimise the
+        rewriting algorithm
+    \item Add warning messages, tracing and a debug mode to the rewriter as per
+        \hyperfootnote[this
+        issue]{https://}{www.github.com/conjure-cp/conjure-oxide/issues/181} 
+\end{itemize}
+\subsection{Secondary objectives}
+\begin{itemize}
+    
+    \item Research optimisation techniques, particularly those found
+        within Savile Row, and implement them for the rewriter
+\item Work on features of the rewriter that are requested by the rest of
+    the Rust team
+\item Continue working on the documentation for the rewriter and the rest
+    of the Rust code base
+\end{itemize}

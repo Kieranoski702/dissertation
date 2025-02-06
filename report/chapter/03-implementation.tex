@@ -1,0 +1,291 @@
+\mychapter{3}{Denotational Semantics}
+\label{chapter:denotationalsemantics}
+
+The core of this practical is the design of denotational semantics for Anne,
+translating Anne's syntax into lambda-calculus expressions. The main function
+is \texttt{denot}, which translates a well-typed Anne program (\texttt{AProg}) into lambda-calculus (\texttt{LC}).
+
+Note that you can find a lot of examples of my \texttt{denot} function being used in conjunction
+with my \texttt{eval} function to get the correct results in my tests.
+
+\section{Syntax of Anne}
+
+Before we can define the denotational semantics of Anne, we need to define the
+syntax of Anne. The syntax of Anne is given in the practical specification but there are
+quite a lot of decisions to be made when translating the syntax into Haskell. The
+following Haskell data types represent the syntax of Anne:
+
+\begin{lstlisting}[language=Haskell]
+
+-- Haskell data types for Anne
+
+-- Representation of an Anne program
+data AProg = AProg Module Stmt
+  deriving (Show, Eq)
+
+-- Representation of Modules
+data Module
+  = Module Def Module
+  | EmptyModule
+  deriving (Show, Eq)
+
+-- Representation of Definitions
+data Def
+  = Function Int TypeDef Stmt Def
+  | Procedure Int TypeDef Stmt Def
+  | TypeDecl Int TypeDef
+  | EmptyDef
+  deriving (Show, Eq)
+
+data Type
+  = Int
+  | Bool
+  deriving (Show, Eq)
+
+-- Representation of Types
+data TypeDef
+  = VarType Int Type
+  | SeqType TypeDef TypeDef
+  deriving (Show, Eq)
+
+-- Representation of statements
+data Stmt
+  = Assign Int Expr
+  | Case Int CaseClause
+  | Loop Stmt Int
+  | Return Expr
+  | Seq Stmt Stmt
+  | ProcedureCall Int
+  deriving (Show, Eq)
+
+-- Representation of case clauses
+data CaseClause
+  = CaseClause Int Stmt
+  | CaseSeq CaseClause CaseClause
+  deriving (Show, Eq)
+
+-- Representation of Expressions
+data Expr
+  = Var Int
+  | LitN Int
+  | LitB Bool
+  | Add Expr Expr
+  | Neg Expr
+  | Leq Expr Expr
+  | FunCall Int
+  deriving (Show, Eq)
+
+\end{lstlisting}
+
+There were quite a few interesting design decisions that had to be made when
+translating the Anne syntax into Haskell data types. Firstly, all the variables
+are Haskell integers instead of strings. This is because the \texttt{LC} data
+type uses integers to represent variables. It would be possible to create some
+environment data type to map strings to integers, but I think this keeps the
+implementation more consistent and closer to the specification.
+
+Secondly, I have technically modified the syntax given to us by changing the
+single literal $l$ into LitN and LitBool. This was done mainly due to how
+Haskell handles \texttt{Data} types. For example, I could have kept the single
+literal syntax by implementing it as an \texttt{Either} type which could be
+either a number or a boolean. However, when reading an Anne program every
+literal would have to be wrapped in a \texttt{Left} or \texttt{Right}
+constructor. The \texttt{Left} and \texttt{Right} constructors do not properly
+convey the meaning of the literal.
+
+Thirdly, I have extended the syntax to include function and procedure
+application. This was done as an extension to the original specification but
+all the features of the original specification are still supported with or
+without this change.
+
+\section{Denotational Semantics}
+
+The denotational semantics of Anne is defined by a top level \texttt{denot} function which
+takes in an Anne program and returns a lambda-calculus expression. However, this function
+is built up from a number of smaller functions which define the denotational semantics of
+the various parts of Anne. In addition to this, the most complex and consequential
+design decision needs to be made in regard to state and how it is handled in the
+denotational semantics of Anne.
+
+\subsection{State and Environment}
+\label{section:state}
+
+The denotational semantics of Anne is stateful. This is because Anne has the
+ability to define and call functions and procedures as well as use sequences of
+statements. This means that the denotational semantics of Anne needs to keep
+track of the state of the program as it is being evaluated. There are many ways
+to handle this state. One way is defined by Nielson and Nielson in their book
+\textit{Semantics with Applications: A Formal Introduction} \cite{nielsonsemantics}.
+They define a variable environment that associates location with each variable and
+a store that maps locations to values. This approach is very similar to languages
+like C and Pascal where variables are stored in memory locations and the value of
+a variable is the value stored at the memory location. I decided to take a different
+approach to state as I believed that Haskell's monad system would allow me to
+handle state in a more elegant way.
+
+I originally created a monad, \texttt{AnneM}, which kept track of the environment (a list of
+pairs of variable names and their values) and the state of the program. However, I ended
+up scrapping this approach for two reasons. Firstly, I found that the monad system made it extremely
+difficult to allow looping to work correctly. As the loop has to be in lambda calculus, the combination
+of the Y Combinator and a recursive lambda calculus function has to be used to implement looping. Updating and
+using the state within the recursive function was extremely difficult. Secondly, I had to change the type signature of the \texttt{denot}
+function that we were given to return a \texttt{AnneM LC} instead of just an \texttt{LC}.
+
+My final solution was to pass an extra \texttt{LC} argument throughout the denotational semantics functions which represents
+the state of the running program. In addition, I use Church lists to represent the environment within the lambda calculus itself
+rather than using a separate environment data type. This makes it trivial to update and use the state as it can be used just like any other
+lambda calculus expression. An easy way to understand my implementation is by looking at how sequential composition of statements and
+variable lookup/assignment is implemented. Here are the snippets of code from my \texttt{denotStmt} and \texttt{denotExpr} functions which are fully defined later
+in this chapter:
+
+\begin{lstlisting}[language=Haskell]
+-- Denotational Semantics of Sequential Composition of Statements
+denotStmt (Seq s1 s2) state = denotStmt s2 (denotStmt s1 state)
+
+-- Variable Lookup and Assignment
+denotExpr (Var x) state = LApp (LApp (LApp churchLookup (churchNum x)) state) state
+denotStmt (Assign x expr) state = LApp (LApp churchCons (LApp (LApp churchPair (churchNum x)) (LAbs 0 (denotExpr expr state)))) state
+\end{lstlisting}
+
+The \texttt{denotStmt} function takes in a sequence of statements and the current state of the program. It then evaluates the first statement
+using the current state and then evaluates the second statement using the state that was returned from the first statement. This is a very
+simple way to handle state which is easy to reason about. The \texttt{denotExpr} function takes in a variable and the current state of the program.
+It then uses the \texttt{churchLookup} function to look up the value of the variable in the state. The state will have a Church list of pairs of variable
+names and their values due to how variable assignment is implemented. Note that the reason that state is applied twice is due to how function and procdeure
+application is implemented which is explained in detail in \nameref{section:functionandprocedureapplication}.
+
+\subsection{Denotational Semantics of Expressions}
+
+The denotational semantics of expressions in Anne is defined by the \texttt{denotExpr} function. This function is defined as follows:
+
+\begin{lstlisting}[language=Haskell]
+denotExpr :: Expr -> LC -> LC
+denotExpr (Var x) state = LApp (LApp (LApp churchLookup (churchNum x)) state) state
+denotExpr (LitN n) _ = churchInt n
+denotExpr (LitB True) _ = churchTrue
+denotExpr (LitB False) _ = churchFalse
+denotExpr (Add e1 e2) state = LApp (LApp churchIntPlus (denotExpr e1 state)) (denotExpr e2 state)
+denotExpr (Neg e) state = LApp churchIntNeg (denotExpr e state)
+denotExpr (Leq e1 e2) state = LApp (LApp churchIntLeq (denotExpr e1 state)) (denotExpr e2 state)
+denotExpr (FunCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+\end{lstlisting}
+
+The function is quite simple as it can be implemented by using simple Church encodings I have already defined.
+
+\subsection{Denotational Semantics of Statements}
+
+The denotational semantics of statements in Anne are defined by the \texttt{denotStmt} and \texttt{denotCase} functions. This function is defined as follows:
+
+\begin{lstlisting}[language=Haskell]
+denotStmt :: Stmt -> LC -> LC
+denotStmt (Assign x expr) state = LApp (LApp churchCons (LApp (LApp churchPair (churchNum x)) (LAbs 0 (denotExpr expr state)))) state
+denotStmt (Return expr) state = denotExpr expr state
+denotStmt (Seq s1 s2) state = denotStmt s2 (denotStmt s1 state)
+denotStmt (Loop body cond) state = LApp (LApp (LApp yCombinator churchLoop) (churchNum cond)) state
+  where
+    -- $\lambda$f.$\lambda$v.$\lambda$s.(if (lookup v s) then (s) else ({f v (result of b)})
+    churchLoop = LAbs 1 (LAbs 2 (LAbs 3 (LApp (LApp (LApp churchIf (LApp (LApp (LApp churchLookup (LVar 2)) (LVar 3)) (LVar 3))) (LVar 3)) (LApp (LApp (LVar 1) (LVar 2)) (denotStmt body (LVar 3))))))
+denotStmt (Case x clauses) state = denotCase clauses x state
+denotStmt (ProcedureCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+
+-- Helper function to handle case clauses
+denotCase :: CaseClause -> Int -> LC -> LC
+denotCase (CaseClause y stmt) x state = LApp (LApp (LApp churchIf (LApp (LApp churchIntEq (LApp (LApp (LApp churchLookup (churchNum x)) state) state)) (LApp (LApp (LApp churchLookup (churchNum y)) state) state))) (denotStmt stmt state)) state
+denotCase (CaseSeq c1 c2) x state = denotCase c2 x (denotCase c1 x state)
+\end{lstlisting}
+
+The \texttt{denotStmt} function is quite complex as it has to handle all the different types of statements that Anne supports. The most complex
+part of the \texttt{denotStmt} function is the handling of loops. Loops are implemented using the Y Combinator and a recursive lambda calculus
+function. The Y Combinator is a fixed point combinator which allows for recursion in lambda calculus. The \texttt{churchLoop} function is a lambda
+calculus function which takes in itself, the condition of the loop, and the state of the program. It then checks if the condition is true and if it
+is then it returns the state of the program otherwise it calls itself with the result of running the body of the loop. Please note that looping can take
+a long time to run depending on how complex the loop body is - my tests have two loop examples which prove that it works but if you use custom examples try
+to keep them simple if you encounter long run times.
+
+Another interesting part of the \texttt{denotStmt} function is the handling of case statements. A single case caluse checks if the value of the
+variable $x$ is equal to the value of the variable $y$. If it is then it runs the statement associated with the case clause. If it is not then it simply returns
+the unmodified state. While this sounds simple, the implementation is quite verbose due to the fact that we need to lookup the value of each variable in the state
+and then compare them.
+
+\subsection{Denotational Semantics of Programs, Modules, and Definitions}
+
+The denotational semantics of programs, modules, and definitions in Anne is defined by the \texttt{denot}, \texttt{denotModule}, \texttt{denotDef}, and \texttt{denotType} functions.
+These functions are defined as follows:
+
+\begin{lstlisting}[language=Haskell]
+denot :: AProg -> LC
+denot (AProg module' stmt) = denotStmt stmt (denotModule module' churchNil)
+
+denotModule :: Module -> LC -> LC
+denotModule EmptyModule state = state
+denotModule (Module def nextModule) state = denotModule nextModule (denotDef def state)
+
+denotDef :: Def -> LC -> LC
+denotDef (Function name _ty stmt nextDef) state = denotDef nextDef updatedState
+  where
+    functionBody = LAbs 0 (denotStmt stmt (LVar 0))
+    updatedState = LApp (LApp churchCons (LApp (LApp churchPair (churchNum name)) functionBody)) state
+denotDef (Procedure name _ty stmt nextDef) state = denotDef nextDef updatedState
+  where
+    procedureBody = LAbs 0 (denotStmt stmt (LVar 0))
+    updatedState = LApp (LApp churchCons (LApp (LApp churchPair (churchNum name)) procedureBody)) state
+denotDef (TypeDecl _typename typedef) state = denotType typedef state
+denotDef EmptyDef state = state
+
+denotType :: TypeDef -> LC -> LC
+denotType (VarType varname ty) state = LApp (LApp churchCons (LApp (LApp churchPair (churchNum varname)) (typeToLC ty))) state
+denotType (SeqType ty1 ty2) state = denotType ty2 (denotType ty1 state)
+
+typeToLC :: Type -> LC
+typeToLC Int = churchInt 0
+typeToLC Bool = churchFalse
+\end{lstlisting}
+
+The \texttt{denot} function is the top level function which takes in an Anne
+program and returns a lambda calculus expression. It does this by calling the
+\texttt{denotStmt} function with the statement of the program and the result of
+calling the \texttt{denotModule} function with the module of the program and
+the empty state. So essentially everything defined in the module is added to
+the state and then the statement of the program is evaluated using this state.
+
+Most of the interesting design decisions relate to type declarations. I assume
+that type declarations are a declaration of all the variables that module will
+use. Please see the \nameref{section:limitations} section for more information on this.
+Additionally, as our lambda calculus does not have types, I do not use
+the types declared in any other part of the program. Instead, I simply add the variable names to the state
+with a default value of 0 for integers and false for booleans.
+
+The function and procedure definitions are quite simple. They are added to the
+state with their name and a lambda calculus function which represents the body
+of the function or procedure. While procedures are supposed to be distinctly
+different from functions due to the fact that they do not return a value, I am
+assuming that the parser will ensure that procedure bodies do not have a return
+statement. In addition, due to the way I have implemented state and the
+environment, all variables are global and can be accessed from anywhere in the
+program. My functions and procedures use this so that they can take in 0
+arguments and still access the variables they need to. However, this means that
+any variable used in the body of a function or procedure must be declared
+before the function is called. I am assuming that the parser will ensure that
+this is the case.
+
+\subsection{Function and Procedure Application}
+\label{section:functionandprocedureapplication}
+
+Function and procedure application is defined by the \texttt{denotExpr} and \texttt{denotStmt} functions respectively.
+
+\begin{lstlisting}[language=Haskell]
+denotExpr (FunCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+
+denotStmt (ProcedureCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+\end{lstlisting}
+
+Function and procedure application is quite simple. It is implemented by
+looking up the function or procedure in the state and then applying the state
+to the lambda calculus function that represents the function or procedure. This
+has a knock on effect on variable lookup and \texttt{churchLookup} in general. As
+variable assignment and lookup needs to work for general expressions which
+don't have to be applied to the state and functions/procedures that do, the
+state needs to be applied twice in all cases. Functions and procedures will use
+the state to access the variables they need to while general expressions will
+not use the state at all but, in Haskell terms, it still needs to be
+applied.

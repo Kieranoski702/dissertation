@@ -1,0 +1,52 @@
+\mychapter{3}{Testing}
+\label{chapter:testing}
+
+All tests were run on a lab machine. To run the tests, run the following commands in the \texttt{code} subdirectory:
+
+\begin{lstlisting}[escapeinside={(*}{*)}]
+$ ghc -main-is Test.mainTests -o Test Test.hs ANF.hs Defun.hs
+$ ./Test
+\end{lstlisting}
+
+This will run all the tests and output the results to the console. As you can
+see from the terminal output below, all tests pass. If you are interested in
+the exact programs being run by each test, then please look at the
+\texttt{Test.hs} file in the \texttt{code} subdirectory. Please note I have
+copied the textual output of the terminal directly instead of taking a
+screenshot for accessibility reasons, but you can run the tests yourself to
+verify the results.
+
+\begin{lstlisting}
+****@pc8-025-l:~/pldi-p2/code $ ./Test
+Running test suite for Defun.hs and ANF.hs...
+Running test: Double a number
+PASS: Expected = 6, Returned = 6
+Running test: Factorial of 5
+PASS: Expected = 120, Returned = 120
+Running test: Extract first element of a pair
+PASS: Expected = 1, Returned = 1
+Running test: Sum elements of a predefined list
+PASS: Expected = 3, Returned = 3
+Running test: Sum after mapping double over a list
+PASS: Expected = 6, Returned = 6
+Running test: Sum empty list (Nil)
+PASS: Expected = 0, Returned = 0
+Running test: Factorial of 0 (base case)
+PASS: Expected = 1, Returned = 1
+Running test: Over application
+PASS: Expected = 6, Returned = 6
+Running test: Under application and then apply
+PASS: Expected = 4, Returned = 4
+Running test: Empty definitions, valid program (1 + 1)
+PASS: Expected = 2, Returned = 2
+Running test: Add two numbers
+PASS: Expected = 7, Returned = 7
+Running test: Add zero
+PASS: Expected = 10, Returned = 10
+Running test: Add negative numbers
+PASS: Expected = -8, Returned = -8
+Running test: Complex chaining: add -> map -> sum
+PASS: Expected = 0, Returned = 0
+Passed 14 out of 14 tests.
+\end{lstlisting}
+
