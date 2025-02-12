@@ -1,95 +1,9 @@
 \mychapter{4}{Evaluation}
 \label{chapter:evaluation}
 
-The implementation of the practical demonstrates the transformation of a
-high-level expression language into executable Java code. While the objectives
-were successfully achieved, the process presented several challenges that
-required creative solutions. This section discusses these challenges, the
-strategies employed to address them, and the limitations that remain.
 
 \section{Challenges and Solutions}
-One of the most significant challenges was handling partial and
-over-application of functions during the defunctionalisation phase. Partial
-application, where a function is called with fewer arguments than its arity,
-had to be represented in a way that could carry the state of the partially
-applied arguments. Over-application, where more arguments are passed than
-expected, required similar attention to dynamically manage the additional
-arguments. The solution involved introducing a specialized \texttt{APPLY} function,
-which could handle these cases uniformly by encapsulating partially applied
-functions in constructors. For example, if a function was partially applied, a
-constructor object was created to hold the applied arguments, while
-over-applied functions were processed iteratively using \texttt{APPLY}.
-
-Another notable challenge was ensuring variable name uniqueness during
-the conversion to Administrative Normal Form (ANF). In ANF, intermediate
-expressions must be assigned to unique variables, and collisions could lead to
-incorrect behavior or compilation errors in the generated Java code. To address
-this, a \texttt{fresh} function dynamically generated unique variable names
-based on the current program state, ensuring that no two variables shared the
-same name. This systematic approach avoided errors and allowed for seamless
-integration of complex nested expressions into the ANF representation.
-
-The translation of case expressions into Java posed another
-significant obstacle. In the high-level expression language, \texttt{case} expressions
-operate on constructors, allowing dynamic pattern matching. Mapping this to
-Java required a design that encapsulated constructors with a tag and arguments,
-enabling \texttt{switch}-like behavior in Java. The solution involved defining a
-\texttt{Constructor} class in the generated Java code, with fields for a tag (to
-identify the constructor type) and an array of arguments (to hold the
-constructor's values). During code generation, case expressions were converted
-to Java \texttt{switch} blocks, dynamically extracting constructor arguments as needed.
-
-Finally, the recursive nature of some language features, such as functions
-operating on lists, presented a challenge in both correctness and efficiency.
-For instance, translating the \texttt{map} function required careful nesting of function
-calls to maintain correctness in both defunctionalisation and ANF stages. While
-this was successfully handled, it required intricate management of argument
-passing and scoping.
 
 \section{Limitations}
-Despite the successes, the implementation has several limitations. The
-generated Java code, while functional, is not optimized for readability or
-efficiency. The reliance on a generic \texttt{Object} type for all values adds a level
-of indirection, making the code harder to interpret and potentially introducing
-runtime overhead. Although this approach simplifies type handling in Java, it
-sacrifices the strong typing guarantees available in the original Haskell
-representation.
-
-Another limitation lies in the recursive functions’ behavior in Java. Deeply
-nested recursive calls can lead to stack overflow errors, as Java's runtime
-does not optimize tail recursion. This contrasts with Haskell’s ability to
-handle such scenarios more gracefully due to its lazy evaluation model.
-Addressing this would require additional work to transform recursive functions
-into iterative equivalents during code generation, which was beyond the scope
-of this practical.
-
-Additionally, while the implementation handles partial application effectively,
-it does so at the cost of introducing intermediate constructors for partially
-applied functions. This approach, while conceptually elegant, adds complexity
-to the generated Java code and increases runtime overhead when functions are
-applied repeatedly. A more efficient approach could involve precomputing
-closures or directly translating partial applications to inline methods.
-
-Finally, error handling in the generated Java code is minimal. The high-level
-language assumes type correctness and valid inputs, but the generated Java does
-not perform robust checks for invalid states, such as mismatched constructor
-tags in \texttt{case} expressions. Adding such checks would enhance robustness but would
-also increase the size and complexity of the generated code.
 
 \section{Reflection and Future Work}
-Overall, the implementation successfully achieves the goals of the practical.
-The use of intermediate representations, such as ANF, demonstrates a clear
-pipeline from a high-level language to executable Java code. However, future
-work could focus on improving the readability and performance of the generated
-code. This could include optimizations for recursive functions, more efficient
-handling of partial applications, and enhanced error handling in the Java
-output. Furthermore, incorporating static typing into the generated code could
-align more closely with Java's strengths, reducing runtime overhead and
-improving maintainability.
-
-The practical provided valuable insights into compiler design, particularly the
-importance of well-defined intermediate representations. By addressing the
-challenges and recognizing the limitations, this implementation highlights both
-the complexity and elegance of transforming abstract syntax trees into
-executable code.
-
