@@ -1,8 +1,49 @@
+# Dependecies for everything
+## xwiimote
+
+All this information can be found [here](https://github.com/marthjod/wiipy/)
+
+### Build [xwiimote](https://github.com/dvdhrm/xwiimote)
+
+- dependencies: [ref](https://github.com/dvdhrm/xwiimote-bindings/pull/8)
+    - swig
+    - autoconf
+    - libtool
+    - python3-dev
+    - libncurses-dev
+    - libudev-dev
+- the pre-compiled package found in the Debian Jessie repo is too old ([ref](https://github.com/dvdhrm/xwiimote-bindings/issues/13))
+- `./configure --prefix=/usr` **or** append `LD_LIBRARY_PATH` later on ([ref](https://askubuntu.com/questions/633949/failed-to-build-xwiimote-bindings))
+
+
+### Build [xwiimote-bindings](https://github.com/dvdhrm/xwiimote-bindings)
+
+```
+./autogen.sh
+make
+sudo make install
+```
+
+### Use xwiimote Python binding
+
+```bash
+# optional
+# export LD_LIBRARY_PATH=/usr/local/lib
+python test.py [--debug]
+```
+
+## WiimoteEmulator
+- libdbus-1-dev
+- libglib2.0-dev
+- libsdl1.2-dev
+
+
 # Wii remote connection to pi
 
 https://blog.malware.re/2023/07/04/Wiimote-on-Linux-with-dev-input/index.html
 
-1. Corroded Wii remote mac address is 00:1F:C5:6D:AE:A6
+First edit `/etc/bluetooth/input.conf`. Change the line `#ClassicBondedOnly=true` to `ClassicBondedOnly=false`
+1. Corroded Wii remote mac address is 00:1F:C5:6D:AE:A6. Other one is 00:22:4C:7A:02:AC
 2. Run `bluetoothctl`
 3. Type `trust [address]` but press the 1 and 2 key on Wii remote before running
 4. Type `connect [address]` but press a button before running
