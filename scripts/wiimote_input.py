@@ -7,7 +7,7 @@ import sys
 
 # --- Configuration ---
 # Change these to match your network settings
-EMULATOR_IP = "192.168.1.100"  # IP address where the emulator is running
+EMULATOR_IP = "192.168.20.10"  # IP address where the emulator is running
 EMULATOR_PORT = 5000  # Port number for socket input mode
 
 # Define the event type for pointer update.
