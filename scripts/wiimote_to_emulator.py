@@ -167,7 +167,7 @@ def main():
                         )
 
                         # Pack a binary accelerometer packet: header 0x03 followed by three big-endian floats.
-                        packet = struct.pack("!Bfff", 0x03, norm_ax, norm_ay, norm_az)
+                        packet = struct.pack("!Bfff", 0x03, x_val, y_val, z_val)
                         udp_sock.sendto(packet, emulator_addr)
                         logger.debug(
                             "Sent accelerometer update: ax=%.3f, ay=%.3f, az=%.3f",
