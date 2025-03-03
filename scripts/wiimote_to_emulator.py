@@ -156,10 +156,9 @@ def main():
                         )
 
                         # Normalize the raw values.
-                        # Assumption: at rest the reading is ~532 and scale factor is 108 (per your C constants).
-                        norm_ax = (x_val - 532.0) / 108.0
-                        norm_ay = (y_val - 532.0) / 108.0
-                        norm_az = (z_val - 532.0) / 108.0
+                        norm_ax = x_val - 532.0
+                        norm_ay = y_val - 532.0
+                        norm_az = z_val - 532.0
                         logger.debug(
                             "Normalized accelerometer: ax=%.3f, ay=%.3f, az=%.3f",
                             norm_ax,
