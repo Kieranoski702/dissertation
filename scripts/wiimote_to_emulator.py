@@ -153,9 +153,9 @@ def main():
                         ir_x, ir_y, ir_z = evt.get_abs(0)
                         logger.debug("IR event: x=%f, y=%f, z=%f", ir_x, ir_y, ir_z)
                         # Coordinates come in as integers, so normalize them to floats in [0, 1].
-                        ir_x = ir_x / 1023.0
-                        ir_y = ir_y / 767.0
-                        ir_z = ir_z / 1023.0
+                        ir_x = 1.0 - (ir_x / 1023.0)
+                        ir_y = 1.0 - (ir_y / 767.0)
+                        ir_z = 1.0 - (ir_z / 1023.0)
                         # Pack a binary packet: 0x02, then three floats (x, y, z) in network byte order.
                         packet = struct.pack("!Bfff", 0x02, ir_x, ir_y, ir_z)
                         udp_sock.sendto(packet, emulator_addr)
