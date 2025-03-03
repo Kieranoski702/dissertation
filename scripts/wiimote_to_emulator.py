@@ -148,6 +148,11 @@ def main():
                             norm_y,
                         )
 
+                    elif evt.type == xwiimote.EVENT_IR:
+                        # Process IR events
+                        x, y, z = evt.get_abs(0)
+                        logger.debug("IR event: x=%s, y=%s, z=%s", x, y, z)
+
                     elif evt.type == xwiimote.EVENT_KEY:
                         # Process key (button) events
                         code, state = evt.get_key()
@@ -171,9 +176,53 @@ def main():
                                 )
                         elif code == xwiimote.KEY_HOME:
                             if state == 1:
-                                udp_sock.sendto(b"button 1 WIIMOTE_HOME", emulator_addr)
+                                udp_sock.sendto(b"button 1 HOME", emulator_addr)
                             else:
-                                udp_sock.sendto(b"button 0 WIIMOTE_HOME", emulator_addr)
+                                udp_sock.sendto(b"button 0 HOME", emulator_addr)
+                        elif code == xwiimote.KEY_A:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_A", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_A", emulator_addr)
+                        elif code == xwiimote.KEY_B:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_B", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_B", emulator_addr)
+                        elif code == xwiimote.KEY_UP:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_UP", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_UP", emulator_addr)
+                        elif code == xwiimote.KEY_DOWN:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_DOWN", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_DOWN", emulator_addr)
+                        elif code == xwiimote.KEY_LEFT:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_LEFT", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_LEFT", emulator_addr)
+                        elif code == xwiimote.KEY_RIGHT:
+                            if state == 1:
+                                udp_sock.sendto(
+                                    b"button 1 WIIMOTE_RIGHT", emulator_addr
+                                )
+                            else:
+                                udp_sock.sendto(
+                                    b"button 0 WIIMOTE_RIGHT", emulator_addr
+                                )
+                        elif code == xwiimote.KEY_ONE:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_ONE", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_ONE", emulator_addr)
+                        elif code == xwiimote.KEY_TWO:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_TWO", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"buttoon 0 WIIMOTE_TWO", emulator_addr)
 
         except KeyboardInterrupt:
             logger.info("Exiting...")
