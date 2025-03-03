@@ -86,6 +86,7 @@ def main():
     logger.info("Searching for a Wiimote...")
     dev, mon = get_first_wiimote(logger)
     if dev is None:
+        print("No wiimote found")
         sys.exit(1)
 
     try:
@@ -148,12 +149,31 @@ def main():
                         )
 
                     elif evt.type == xwiimote.EVENT_KEY:
-                        # Process key (button) events if desired.
+                        # Process key (button) events
                         code, state = evt.get_key()
                         logger.debug("Button event: code=%s, state=%s", code, state)
-                        # You might send a separate packet for button events here.
-
-                    # You can add additional event types as needed.
+                        # Send button state over udp using text based format (type status actioni).For example, to press and
+                        # hold the Wiimote + button you would send "button 1 WIIMOTE_PLUS". To release the + button you would
+                        # send "button 0 WIIMOTE_PLUS".
+                        if code == xwiimote.KEY_PLUS:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_PLUS", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_PLUS", emulator_addr)
+                        elif code == xwiimote.KEY_MINUS:
+                            if state == 1:
+                                udp_sock.sendto(
+                                    b"button 1 WIIMOTE_MINUS", emulator_addr
+                                )
+                            else:
+                                udp_sock.sendto(
+                                    b"button 0 WIIMOTE_MINUS", emulator_addr
+                                )
+                        elif code == xwiimote.KEY_HOME:
+                            if state == 1:
+                                udp_sock.sendto(b"button 1 WIIMOTE_HOME", emulator_addr)
+                            else:
+                                udp_sock.sendto(b"button 0 WIIMOTE_HOME", emulator_addr)
 
         except KeyboardInterrupt:
             logger.info("Exiting...")
