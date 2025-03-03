@@ -149,9 +149,16 @@ def main():
                         )
 
                     elif evt.type == xwiimote.EVENT_IR:
-                        # Process IR events
-                        x, y, z = evt.get_abs(0)
-                        logger.debug("IR event: x=%s, y=%s, z=%s", x, y, z)
+                        # Retrieve IR data from the wiimote.
+                        # Assume evt.get_abs(0) returns a tuple (x, y, z) with normalized values (e.g. in [0,1])
+                        ir_x, ir_y, ir_z = evt.get_abs(0)
+                        logger.debug("IR event: x=%f, y=%f, z=%f", ir_x, ir_y, ir_z)
+                        # Pack a binary packet: 0x02, then three floats (x, y, z) in network byte order.
+                        packet = struct.pack("!Bfff", 0x02, ir_x, ir_y, ir_z)
+                        udp_sock.sendto(packet, emulator_addr)
+                        logger.debug(
+                            "Sent IR update: x=%.3f, y=%.3f, z=%.3f", ir_x, ir_y, ir_z
+                        )
 
                     elif evt.type == xwiimote.EVENT_KEY:
                         # Process key (button) events
