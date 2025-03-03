@@ -156,9 +156,9 @@ def main():
                         )
 
                         # Normalize the raw values.
-                        norm_ax = (x_val - 532.0) / 108.0
-                        norm_ay = (y_val - 532.0) / 108.0
-                        norm_az = (z_val - 532.0) / 108.0
+                        norm_ax = x_val + 532.0
+                        norm_ay = y_val + 532.0
+                        norm_az = z_val + 532.0
                         logger.debug(
                             "Normalized accelerometer: ax=%.3f, ay=%.3f, az=%.3f",
                             norm_ax,
@@ -167,7 +167,7 @@ def main():
                         )
 
                         # Pack a binary accelerometer packet: header 0x03 followed by three big-endian floats.
-                        packet = struct.pack("!Bfff", 0x03, x_val, y_val, z_val)
+                        packet = struct.pack("!Bfff", 0x03, norm_ax, norm_ay, norm_az)
                         udp_sock.sendto(packet, emulator_addr)
                         logger.debug(
                             "Sent accelerometer update: ax=%.3f, ay=%.3f, az=%.3f",
