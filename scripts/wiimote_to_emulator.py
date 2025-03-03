@@ -124,29 +124,46 @@ def main():
                         continue
 
                     # Process event types
+                    # if evt.type == xwiimote.EVENT_ACCEL:
+                    #     # Retrieve accelerometer data; for example, using channel 0.
+                    #     # (Depending on your device and desired pointer data, you might
+                    #     # choose a different event type or process multiple channels.)
+                    #     x_val, y_val, z_val = evt.get_abs(0)
+                    #     logger.debug(
+                    #         "Raw accelerometer: x=%f, y=%f, z=%f", x_val, y_val, z_val
+                    #     )
+
+                    #     # # Convert these raw values to normalized pointer coordinates.
+                    #     # # (For example, assume x_val and y_val are in [-1, 1] and map them
+                    #     # # to [0, 1]. Adjust this mapping to your actual device’s output.)
+                    #     # norm_x = (x_val + 1) / 2.0
+                    #     # norm_y = (y_val + 1) / 2.0
+
+                    #     # # Pack a binary packet: 0x01, followed by norm_x and norm_y as big-endian floats.
+                    #     # packet = struct.pack("!Bff", 0x01, norm_x, norm_y)
+                    #     # udp_sock.sendto(packet, emulator_addr)
+                    #     # logger.debug(
+                    #     #     "Sent pointer update: norm_x=%.3f, norm_y=%.3f",
+                    #     #     norm_x,
+                    #     #     norm_y,
+                    #     # )
+
                     if evt.type == xwiimote.EVENT_ACCEL:
-                        # Retrieve accelerometer data; for example, using channel 0.
-                        # (Depending on your device and desired pointer data, you might
-                        # choose a different event type or process multiple channels.)
+                        # Retrieve raw accelerometer data from channel 0.
                         x_val, y_val, z_val = evt.get_abs(0)
                         logger.debug(
                             "Raw accelerometer: x=%f, y=%f, z=%f", x_val, y_val, z_val
                         )
 
-                        # # Convert these raw values to normalized pointer coordinates.
-                        # # (For example, assume x_val and y_val are in [-1, 1] and map them
-                        # # to [0, 1]. Adjust this mapping to your actual device’s output.)
-                        # norm_x = (x_val + 1) / 2.0
-                        # norm_y = (y_val + 1) / 2.0
-
-                        # # Pack a binary packet: 0x01, followed by norm_x and norm_y as big-endian floats.
-                        # packet = struct.pack("!Bff", 0x01, norm_x, norm_y)
-                        # udp_sock.sendto(packet, emulator_addr)
-                        # logger.debug(
-                        #     "Sent pointer update: norm_x=%.3f, norm_y=%.3f",
-                        #     norm_x,
-                        #     norm_y,
-                        # )
+                        # Pack a binary accelerometer packet: 0x03 followed by three big-endian floats.
+                        packet = struct.pack("!Bfff", 0x03, x_val, y_val, z_val)
+                        udp_sock.sendto(packet, emulator_addr)
+                        logger.debug(
+                            "Sent accelerometer update: x=%.3f, y=%.3f, z=%.3f",
+                            x_val,
+                            y_val,
+                            z_val,
+                        )
 
                     elif evt.type == xwiimote.EVENT_IR:
                         # Retrieve IR data from the wiimote.
