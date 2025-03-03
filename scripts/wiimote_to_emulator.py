@@ -155,16 +155,27 @@ def main():
                             "Raw accelerometer: x=%f, y=%f, z=%f", x_val, y_val, z_val
                         )
 
-                        # Pack a binary accelerometer packet: 0x03 followed by three big-endian floats.
-                        packet = struct.pack("!Bfff", 0x03, x_val, y_val, z_val)
-                        udp_sock.sendto(packet, emulator_addr)
+                        # Normalize the raw values.
+                        # Assumption: at rest the reading is ~532 and scale factor is 108 (per your C constants).
+                        norm_ax = (x_val - 532.0) / 108.0
+                        norm_ay = (y_val - 532.0) / 108.0
+                        norm_az = (z_val - 532.0) / 108.0
                         logger.debug(
-                            "Sent accelerometer update: x=%.3f, y=%.3f, z=%.3f",
-                            x_val,
-                            y_val,
-                            z_val,
+                            "Normalized accelerometer: ax=%.3f, ay=%.3f, az=%.3f",
+                            norm_ax,
+                            norm_ay,
+                            norm_az,
                         )
 
+                        # Pack a binary accelerometer packet: header 0x03 followed by three big-endian floats.
+                        packet = struct.pack("!Bfff", 0x03, norm_ax, norm_ay, norm_az)
+                        udp_sock.sendto(packet, emulator_addr)
+                        logger.debug(
+                            "Sent accelerometer update: ax=%.3f, ay=%.3f, az=%.3f",
+                            norm_ax,
+                            norm_ay,
+                            norm_az,
+                        )
                     elif evt.type == xwiimote.EVENT_IR:
                         # Retrieve IR data from the wiimote.
                         ir_x, ir_y, ir_z = evt.get_abs(0)
