@@ -158,7 +158,7 @@ def main():
                         # Normalize the raw values.
                         norm_ax = (108 * -x_val) + 512
                         norm_ay = (108 * z_val) + 512
-                        norm_az = (109 * -y_val) + 512
+                        norm_az = (108 * -y_val) + 512
                         logger.debug(
                             "Normalized accelerometer: ax=%.3f, ay=%.3f, az=%.3f",
                             norm_ax,
