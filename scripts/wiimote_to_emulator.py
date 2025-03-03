@@ -215,14 +215,14 @@ def main():
                                 )
                         elif code == xwiimote.KEY_ONE:
                             if state == 1:
-                                udp_sock.sendto(b"button 1 WIIMOTE_ONE", emulator_addr)
+                                udp_sock.sendto(b"button 1 WIIMOTE_1", emulator_addr)
                             else:
-                                udp_sock.sendto(b"button 0 WIIMOTE_ONE", emulator_addr)
+                                udp_sock.sendto(b"button 0 WIIMOTE_1", emulator_addr)
                         elif code == xwiimote.KEY_TWO:
                             if state == 1:
-                                udp_sock.sendto(b"button 1 WIIMOTE_TWO", emulator_addr)
+                                udp_sock.sendto(b"button 1 WIIMOTE_2", emulator_addr)
                             else:
-                                udp_sock.sendto(b"buttoon 0 WIIMOTE_TWO", emulator_addr)
+                                udp_sock.sendto(b"button 0 WIIMOTE_2", emulator_addr)
 
         except KeyboardInterrupt:
             logger.info("Exiting...")
