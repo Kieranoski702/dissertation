@@ -156,9 +156,9 @@ def main():
                         )
 
                         # Normalize the raw values.
-                        norm_ax = (x_val / 1.5) + 527.5
-                        norm_ay = (y_val / 1.5) + 527.5
-                        norm_az = (z_val / 1.5) + 527.5
+                        norm_ax = (x_val / 1.57) + 527.5
+                        norm_ay = (y_val / 1.57) + 527.5
+                        norm_az = (z_val / 1.57) + 527.5
                         logger.debug(
                             "Normalized accelerometer: ax=%.3f, ay=%.3f, az=%.3f",
                             norm_ax,
