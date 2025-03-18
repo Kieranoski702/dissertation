@@ -1,4 +1,4 @@
-\documentclass[abstract=true,headings=standardclasses,titlepage=false]{scrreprt}
+\documentclass[12pt,abstract=true,headings=standardclasses,titlepage=false]{scrreprt}
 \KOMAoption{toc}{bibliography,listof,chapterentrywithdots}
 \KOMAoption{chapterprefix}{false}
 \KOMAoption{parskip}{half-}
@@ -13,6 +13,7 @@
 \usepackage[export]{adjustbox}
 \usepackage{xcolor}
 \usepackage{soul}
+\usepackage{etoolbox}
 
 %TC:fileinclude \import dir,file
 \usepackage{import}
@@ -61,6 +62,8 @@
     \addcontentsline{toc}{chapter}{#2}
 }
 
+\RedeclareSectionCommand[beforeskip=0pt,afterskip=1cm]{chapter}
+
 \usepackage[section]{placeins}
 
 % Required for inserting images
@@ -100,7 +103,8 @@
     
 \graphicspath{{figures/}}
 \title{CS4099 - Nintendo Wii Over IP}
-\author{210018092}
+\author{Kieran Fowlds - 210018092 \\
+Supervisor: Dr. Tom Spink}
 \date{\today}
 
 
@@ -114,6 +118,12 @@
 \begin{center}
 	\includegraphics[width=0.6\linewidth]{figures/logo.png}
 \end{center}
+
+\newpage
+\import{chapter}{abstract.tex}
+\thispagestyle{empty}
+\clearpage
+
 
 \newpage
 \import{}{declaration.tex}
@@ -130,8 +140,9 @@
 %TC:endignore
 
 \import{chapter}{01-overview.tex}
-\import{chapter}{02-design-and-impl.tex}
-\import{chapter}{03-implementation.tex}
+\import{chapter}{02-context-survey.tex}
+\import{chapter}{03-requirements.tex}
+\import{chapter}{04-implementation.tex}
 \import{chapter}{05-evaluation2.tex}
 \import{chapter}{06-conclusion.tex}
 
