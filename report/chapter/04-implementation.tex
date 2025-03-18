@@ -11,7 +11,7 @@
 %
 % Many different wiimote libraries and tools. Decided to use xwiimote (reference) and more specifically used xwiimote python bindings (reference) to create a python script
 %
-% Ran into issue where remote would connect through bluetooth but lights would keep flashing and xwiimote could not detect it. Have to edit '/etc/bluetooth/input.conf' and add the line 'ClassicBondedOnly=false'.
+% Ran into issue where remote would connect through bluetooth but lights would keep flashing and xwiimote could not detect it. Have to edit '/etc/bluetooth/input.conf' and add the line 'ClassicBondedOnly=false'. (reference https://github.com/xwiimote/xwiimote/issues/109)
 %
 % Another challenge was streaming the audio and video from the host pi to the client pi. Main issue was either quality or latency. Higher quality was causing very high latency and vice versa. Solved by using rtp protocol with some very specific setting (show broadcast and play commands here??)
 %
