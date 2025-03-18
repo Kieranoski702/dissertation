@@ -1,9 +1,24 @@
 \mychapter{4}{Implementation}
 \label{chapter:implemntation}
 
-\begin{lstlisting}[language=Haskell]
-denotExpr (FunCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+%% \begin{lstlisting}[language=Haskell]
+%% denotExpr (FunCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
 
-denotStmt (ProcedureCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
-\end{lstlisting}
+%% denotStmt (ProcedureCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+%% \end{lstlisting}
 
+% First challenge was getting the wii remote to connect to the raspberry pis. Required enabling the wii remote Linux drivers using 'modprobe hid-wiimote'. To ensure this always gets loaded at boot time, add it to the modules-load.d configuration: 'echo hid-wiimote | sudo tee /etc/modules-load.d/wiimote.conf'.
+%
+% Many different wiimote libraries and tools. Decided to use xwiimote (reference) and more specifically used xwiimote python bindings (reference) to create a python script
+%
+% Ran into issue where remote would connect through bluetooth but lights would keep flashing and xwiimote could not detect it. Have to edit '/etc/bluetooth/input.conf' and add the line 'ClassicBondedOnly=false'.
+%
+% Another challenge was streaming the audio and video from the host pi to the client pi. Main issue was either quality or latency. Higher quality was causing very high latency and vice versa. Solved by using rtp protocol with some very specific setting (show broadcast and play commands here??)
+%
+% Another part of the project was doing the wii remote emulation from the host pi to the wii. Used a modified version of Wiimote emulator by rnconrad (reference). Specifically modified JRogaishio's fork (reference) of the project whose changes have yet to merged to the original project. Used this fork as it fixes the ip version of the project which allows for receiving commands over a network which is what I want. Also adds some more documentation and fixes a compilation error. My version (reference) adds support for IR and accelerometer data over the ip socket interface. Many challenges here. Mainly figuring out all the accelerometer and IR maths in motion.c as well as adding all the plumbing in input.c and input_socket.c.
+%
+% Also latency issues which have not been resolved. Also issue with IR not going above bottom half of the screen. Potential issue of the tuning of accelerometer will be mario kart specific
+
+% Last hard part was creating the python script that takes all the real wiimote inputs and translates then sends them to the wiimote emulator on the host pi.
+%
+% Maybe creating a device setup script that requires sudo and does all the changing of system files, drivers, Export paths for libs, etc
