@@ -14,6 +14,7 @@
 \usepackage{xcolor}
 \usepackage{soul}
 \usepackage{etoolbox}
+\usepackage{pdfpages}
 
 %TC:fileinclude \import dir,file
 \usepackage{import}
@@ -151,8 +152,10 @@ Supervisor: Dr. Tom Spink}
 % \listoffigures
 % \listoftables
 
-
-% \appendix
+\appendix
+\clearpage
+\renewcommand{\thepage}{}
+\import{appendicies}{ethics.tex}
 % \import{appendicies}{plan-d1-sem2.tex}
 % \import{appendicies}{plan-d2-sem1.tex}
 

@@ -1,0 +1,20 @@
+\includepdf[
+    pages=1,
+    scale=0.7,% initial page needs to be shrunk sufficiently to fit
+    frame,
+    offset={0, -1.5cm},% shift the page over to allow for chapter/section heading.
+    pagecommand={%
+        \chapter{Ethics Approval Form}
+        \label{appendix:ethics}
+        \appendix
+        %% \section{NSD approval}
+    }
+]{ethics_form.pdf}
+\includepdf[
+    pages=2-,
+    scale=0.9,% other pages can use a larger scale
+    frame,
+    %offset={2.5cm, -1.0cm},
+]{ethics_form.pdf}
+
+% \includepdf[pages=-,scale =0.5, offset=0 -0]{ethics_form.pdf}
