@@ -49,9 +49,20 @@
 \lstset{style=mystyle}
 
 \newcommand{\quickwordcount}[1]{%
-  \immediate\write18{texcount -1 -sum -merge -q -inc #1.tex output.bbl > #1-words.sum }%
+  \immediate\write18{texcount -1 -sum -merge -q -inc #1.tex #1.bbl > #1-words.sum }%
   \input{#1-words.sum}words%
 }
+
+%% \usepackage{xesearch}
+%% \newcounter{words}
+%% \newenvironment{counted}{%
+%%   \setcounter{words}{0}
+%%   \SearchList!{wordcount}{\stepcounter{words}}
+%%     {a?,b?,c?,d?,e?,f?,g?,h?,i?,j?,k?,l?,m?,
+%%     n?,o?,p?,q?,r?,s?,t?,u?,v?,w?,x?,y?,z?}
+%%   \UndoBoundary{'}
+%%   \SearchOrder{p;}}{%
+%%   \StopSearching}
 
 % Command for making a chapter where the number does not appear in the title or
 % the table of contents but it's sections and subsections will use the number
@@ -140,6 +151,7 @@ Supervisor: Dr. Tom Spink}
 \setcounter{page}{1}
 %TC:endignore
 
+%% \begin{counted}
 \import{chapter}{01-overview.tex}
 \import{chapter}{02-context-survey.tex}
 \import{chapter}{03-requirements.tex}
@@ -147,6 +159,7 @@ Supervisor: Dr. Tom Spink}
 \import{chapter}{04-implementation.tex}
 \import{chapter}{05-evaluation2.tex}
 \import{chapter}{06-conclusion.tex}
+%% \end{counted}
 
 \printbibliography[title=References]
 % \listoffigures
