@@ -1,11 +1,77 @@
 \mychapter{4}{Implementation}
 \label{chapter:implemntation}
 
-%% \begin{lstlisting}[language=Haskell]
-%% denotExpr (FunCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
+This chapter details the practical development and testing of the system. It focuses on the integration of various hardware and software components, the novel modifications made to existing projects, and the challenges encountered along the way. The discussion covers the connection setup between the Wii Remote and Raspberry Pi, the streaming of audiovisual data, the extension of Wii Remote emulation, and the creation of a Python-based input relay.
 
-%% denotStmt (ProcedureCall name) state = LApp (LApp (LApp churchLookup (churchNum name)) state) state
-%% \end{lstlisting}
+\section{Establishing Wii Remote Connectivity}
+
+One of the initial challenges was to reliably connect the Wii Remote to the Raspberry Pis. This was achieved by enabling the Linux driver for the Wii Remote using:
+
+\begin{lstlisting}[language=bash]
+modprobe hid-wiimote
+\end{lstlisting}
+
+To ensure that this driver is loaded automatically at boot, the following command was added to the modules-load configuration:
+
+\begin{lstlisting}[language=bash]
+echo hid-wiimote | sudo tee /etc/modules-load.d/wiimote.conf
+\end{lstlisting}
+
+This step was crucial for providing a persistent connection between the Wii Remote and the Raspberry Pi environment.
+
+\section{Selection of Wii Remote Libraries and Addressing Bluetooth Issues}
+
+After evaluating multiple libraries and tools for Wii Remote interfacing, the xwiimote\cite{xwiimote} library was chosen, particularly for its Python bindings\cite{xwiimote_bindings}, which allowed for seamless integration into a Python script. During testing, an issue arose where the Wii Remote connected via Bluetooth but exhibited continuously flashing lights, with xwiimote failing to register inputs. Luckily this is a known issue\cite{xwiimote_issue} and could be resolved by modifying the Bluetooth configuration file at \texttt{/etc/bluetooth/input.conf} and adding the following line:
+
+\begin{lstlisting}[language=bash]
+ClassicBondedOnly=false
+\end{lstlisting}
+
+This adjustment enabled proper pairing and stable operation of the Wii Remote.
+
+\section{Audio and Video Streaming Optimisation}
+Streaming audio and video from the host Raspberry Pi to the client Pi posed a significant challenge, with a trade-off observed between media quality and latency. Higher quality streams resulted in high latency, while lower quality streams compromised user experience. The solution was to adopt the Real-time Transport Protocol (RTP) with carefully tuned broadcast and playback settings. Although further optimisations remain possible, this configuration currently offers a balanced compromise between low latency and acceptable media quality.
+
+\section{Wii Remote Emulation Enhancements}
+
+A core component of the project is the emulation of the Wii Remote on the host Raspberry Pi. This was implemented by adapting a modified version of the WiimoteEmulator originally developed by rnconrad\cite{wiimote_emulator}. A fork by JRogaishio\cite{jr_wiimote_emu} was selected for its support for IP-based command reception—a critical requirement for network-based control. My version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over an IP socket interface.
+
+Key challenges in this area included:
+\begin{itemize}
+
+\item \textbf{Mathematical Calibration:} In the \texttt{motion.c} file, significant effort was devoted to understanding and re-calibrating the accelerometer and IR data transformations. This process ensured that the emulated signals closely mimic the physical behaviour of the Wii Remote.
+
+    \item \textbf{Software Integration:} Extensive modifications were required in \texttt{input.c} and \texttt{input\_socket.c} to integrate the new data types and to manage robust network communication. Despite these advances, some latency issues persist, and the IR emulation is currently limited to the lower half of the screen. Additionally, tuning the accelerometer may require further adjustments depending on the game (e.g., specific nuances observed in Mario Kart).
+
+\end{itemize}
+
+\section{Python Script for Input Relay}
+The final major component is a custom Python script that serves as a bridge between real Wii Remote inputs and the emulation layer on the host Raspberry Pi. Utilising the xwiimote Python bindings, the script captures the physical inputs, processes them, and transmits the data to the Wii Remote Emulator. This relay system was designed with robust error handling to manage intermittent connectivity issues, ensuring that inputs are reliably forwarded in real time.
+
+\section{Automation of Device Setup}
+
+To streamline the deployment process, a device setup script was developed. This script requires administrative privileges (sudo) and automates several critical configuration tasks, including:
+
+\begin{itemize}
+
+    \item Loading necessary kernel modules.
+    \item Editing system files (such as /etc/bluetooth/input.conf) to adjust Bluetooth settings.
+    \item Configuring environment variables and export paths for library dependencies.
+\end{itemize}
+
+By automating these tasks, the setup script minimises manual configuration errors and ensures a consistent environment across multiple devices.
+
+\section{Testing and Validation}
+Rigorous testing was conducted to evaluate the performance and reliability of the system
+
+\subsubsection{Connectivity Tests}
+Confirmed that the Wii Remote establishes a stable connection with the Raspberry Pis under various conditions.
+
+\subsubsection{Latency and Quality Measurements}
+Evaluated the balance between media quality and streaming latency, with iterative tuning of RTP settings.
+
+\subsubsection{End-to-End Gameplay Trials}
+Real-world testing using games such as Mario Kart provided insights into the system’s responsiveness and highlighted areas for future refinement, particularly regarding latency and IR display limitations.
 
 % First challenge was getting the wii remote to connect to the raspberry pis. Required enabling the wii remote Linux drivers using 'modprobe hid-wiimote'. To ensure this always gets loaded at boot time, add it to the modules-load.d configuration: 'echo hid-wiimote | sudo tee /etc/modules-load.d/wiimote.conf'.
 %
