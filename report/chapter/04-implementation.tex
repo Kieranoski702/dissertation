@@ -11,7 +11,7 @@ One of the initial challenges was to reliably connect the Wii Remote to the Rasp
 modprobe hid-wiimote
 \end{lstlisting}
 
-To ensure that this driver is loaded automatically at boot, the following command was added to the modules-load configuration:
+To ensure that this driver is loaded automatically at boot, the following command was run to add the wiimote drivers to the modules-load configuration:
 
 \begin{lstlisting}[language=bash]
 echo hid-wiimote | sudo tee /etc/modules-load.d/wiimote.conf
@@ -32,19 +32,28 @@ This adjustment enabled proper pairing and stable operation of the Wii Remote.
 \section{Audio and Video Streaming Optimisation}
 Streaming audio and video from the host Raspberry Pi to the client Pi posed a significant challenge, with a trade-off observed between media quality and latency. Higher quality streams resulted in high latency, while lower quality streams compromised user experience. The solution was to adopt the Real-time Transport Protocol (RTP) with carefully tuned broadcast and playback settings. Although further optimisations remain possible, this configuration currently offers a balanced compromise between low latency and acceptable media quality.
 
+%% TODO: Add the contents of the play-rtp.sh and broadcast-rtp.sh scripts here
+
 \section{Wii Remote Emulation Enhancements}
 
-A core component of the project is the emulation of the Wii Remote on the host Raspberry Pi. This was implemented by adapting a modified version of the WiimoteEmulator originally developed by rnconrad\cite{wiimote_emulator}. A fork by JRogaishio\cite{jr_wiimote_emu} was selected for its support for IP-based command reception—a critical requirement for network-based control. My version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over an IP socket interface.
+A core component of the project is the emulation of the Wii Remote on the host Raspberry Pi. This was implemented by adapting a modified version of the \texttt{WiimoteEmulator} originally developed by rnconrad\cite{wiimote_emulator}.
+
+A fork by JRogaishio\cite{jr_wiimote_emu} was selected for its support for IP-based command reception—a critical requirement for network-based control.
+
+My version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over an IP socket interface.
 
 Key challenges in this area included:
 \begin{itemize}
 
-\item \textbf{Mathematical Calibration:} In the \texttt{motion.c} file, significant effort was devoted to understanding and re-calibrating the accelerometer and IR data transformations. This process ensured that the emulated signals closely mimic the physical behaviour of the Wii Remote.
+	% TODO: Change the wording of this
+	\item \textbf{Mathematical Calibration:} In the \texttt{motion.c} file, significant effort was devoted to understanding and re-calibrating the accelerometer and IR data transformations. This process ensured that the emulated signals closely mimic the physical behaviour of the Wii Remote.
 
-    \item \textbf{Software Integration:} Extensive modifications were required in \texttt{input.c} and \texttt{input\_socket.c} to integrate the new data types and to manage robust network communication. Despite these advances, some latency issues persist, and the IR emulation is currently limited to the lower half of the screen. Additionally, tuning the accelerometer may require further adjustments depending on the game (e.g., specific nuances observed in Mario Kart).
+	      % Expand on this part
+	\item \textbf{Software Integration:} Extensive modifications were required in \texttt{input.c} and \texttt{input\_socket.c} to integrate the new data types and to manage robust network communication. Despite these advances, some latency issues persist, and the IR emulation is currently limited to the lower half of the screen. Additionally, tuning the accelerometer may require further adjustments depending on the game (e.g., specific nuances observed in Mario Kart).
 
 \end{itemize}
 
+% TODO: Expand
 \section{Python Script for Input Relay}
 The final major component is a custom Python script that serves as a bridge between real Wii Remote inputs and the emulation layer on the host Raspberry Pi. Utilising the xwiimote Python bindings, the script captures the physical inputs, processes them, and transmits the data to the Wii Remote Emulator. This relay system was designed with robust error handling to manage intermittent connectivity issues, ensuring that inputs are reliably forwarded in real time.
 
@@ -54,9 +63,9 @@ To streamline the deployment process, a device setup script was developed. This 
 
 \begin{itemize}
 
-    \item Loading necessary kernel modules.
-    \item Editing system files (such as /etc/bluetooth/input.conf) to adjust Bluetooth settings.
-    \item Configuring environment variables and export paths for library dependencies.
+	\item Loading necessary kernel modules.
+	\item Editing system files (such as /etc/bluetooth/input.conf) to adjust Bluetooth settings.
+	\item Configuring environment variables and export paths for library dependencies.
 \end{itemize}
 
 By automating these tasks, the setup script minimises manual configuration errors and ensures a consistent environment across multiple devices.
