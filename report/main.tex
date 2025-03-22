@@ -15,6 +15,9 @@
 \usepackage{soul}
 \usepackage{etoolbox}
 \usepackage{pdfpages}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
 
 %TC:fileinclude \import dir,file
 \usepackage{import}
@@ -73,6 +76,8 @@
     \chapter*{#2}
     \addcontentsline{toc}{chapter}{#2}
 }
+
+\patchcmd{\subsubsection}{\bfseries}{\bfseries\boldmath }{}{}
 
 \RedeclareSectionCommand[beforeskip=0pt,afterskip=1cm]{chapter}
 
