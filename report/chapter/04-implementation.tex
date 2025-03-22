@@ -1,4 +1,4 @@
-\mychapter{4}{Implementation}
+\mychapter{5}{Implementation}
 \label{chapter:implemntation}
 
 This chapter details the practical development and testing of the system. It focuses on the integration of various hardware and software components, the novel modifications made to existing projects, and the challenges encountered along the way. The discussion covers the connection setup between the Wii Remote and Raspberry Pi, the streaming of audiovisual data, the extension of Wii Remote emulation, and the creation of a Python-based input relay.
@@ -36,22 +36,35 @@ Streaming audio and video from the host Raspberry Pi to the client Pi posed a si
 
 \section{Wii Remote Emulation Enhancements}
 
-A core component of the project is the emulation of the Wii Remote on the host Raspberry Pi. This was implemented by adapting a modified version of the \texttt{WiimoteEmulator} originally developed by rnconrad\cite{wiimote_emulator}.
+A core component of the project is the emulation of the Wii Remote on the host Raspberry Pi. This was implemented by adapting a modified version of the \texttt{WiimoteEmulator} originally developed by Ryan Conrad\cite{wiimote_emulator} (known as rnconrad on GitHub). \texttt{WiimoteEmulator} is able to emulate a bluetooth wii controller in software, allowing the wii to be controlled by many different input devices such as a keyboard, mouse, or text commands over a network.
 
-A fork by JRogaishio\cite{jr_wiimote_emu} was selected for its support for IP-based command reception—a critical requirement for network-based control.
+A fork of the project by JRogaishio\cite{jr_wiimote_emu} was selected as it fixes two critical bugs. The first
+bug is that the ip command in the original project was not working due to an index error. The second bug is that the original project was not compiling due to a call to \texttt{graceful\_disconnect()} which was not defined.
 
-My version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over an IP socket interface.
+My version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over the IP socket interface.
 
-Key challenges in this area included:
-\begin{itemize}
+\subsection{Enhancements and Challenges}
 
-	% TODO: Change the wording of this
-	\item \textbf{Mathematical Calibration:} In the \texttt{motion.c} file, significant effort was devoted to understanding and re-calibrating the accelerometer and IR data transformations. This process ensured that the emulated signals closely mimic the physical behaviour of the Wii Remote.
+\subsubsection{New input events}
+The primary challenge was to extend the existing input events to include IR and accelerometer data. This required significant modifications to the \texttt{input.c} and \texttt{input\_socket.c} files to accommodate the new data types and manage network communication.
 
-	      % Expand on this part
-	\item \textbf{Software Integration:} Extensive modifications were required in \texttt{input.c} and \texttt{input\_socket.c} to integrate the new data types and to manage robust network communication. Despite these advances, some latency issues persist, and the IR emulation is currently limited to the lower half of the screen. Additionally, tuning the accelerometer may require further adjustments depending on the game (e.g., specific nuances observed in Mario Kart).
+\subsubsection{Latency}
 
-\end{itemize}
+\subsubsection{IR emulation}
+
+
+	%%       % Expand on this part
+	%% \item \textbf{Software Integration:} Extensive modifications were required in \texttt{input.c} and \texttt{input\_socket.c} to integrate the new data types and to manage robust network communication. Despite these advances, some latency issues persist, and the IR emulation is currently limited to the lower half of the screen. Additionally, tuning the accelerometer may require further adjustments depending on the game (e.g., specific nuances observed in Mario Kart).
+
+
+
+%% \begin{itemize}
+
+%% 	% TODO: Change the wording of this
+%% 	\item \textbf{Mathematical Calibration:} In the \texttt{motion.c} file, significant effort was devoted to understanding and re-calibrating the accelerometer and IR data transformations. This process ensured that the emulated signals closely mimic the physical behaviour of the Wii Remote.
+
+
+%% \end{itemize}
 
 % TODO: Expand
 \section{Python Script for Input Relay}
