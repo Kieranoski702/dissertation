@@ -122,17 +122,23 @@ To streamline the deployment process, a device setup script was developed. This 
 
 By automating these tasks, the setup script minimises manual configuration errors and ensures a consistent environment across multiple devices.
 
-\section{Testing and Validation}
-Rigorous testing was conducted to evaluate the performance and reliability of the system
+%% \section{Testing and Validation}
+%% Rigorous testing was conducted to evaluate the performance and reliability of the system
 
-\subsubsection*{Connectivity Tests}
-Confirmed that the Wii Remote establishes a stable connection with the Raspberry Pis under various conditions.
+%% \subsubsection*{Connectivity Tests}
+%% Confirmed that the Wii Remote establishes a stable connection with the Raspberry Pis under various conditions.
 
-\subsubsection*{Latency and Quality Measurements}
-Evaluated the balance between media quality and streaming latency, with iterative tuning of RTP settings.
+%% \subsubsection*{Latency and Quality Measurements}
+%% Evaluated the balance between media quality and streaming latency, with iterative tuning of RTP settings.
 
-\subsubsection*{End-to-End Gameplay Trials}
-Real-world testing using games such as Mario Kart provided insights into the system’s responsiveness and highlighted areas for future refinement, particularly regarding latency and IR display limitations.
+%% \subsubsection*{End-to-End Gameplay Trials}
+%% Real-world testing using games such as Mario Kart provided insights into the system’s responsiveness and highlighted areas for future refinement, particularly regarding latency and IR display limitations.
+
+
+
+
+
+
 
 % First challenge was getting the wii remote to connect to the raspberry pis. Required enabling the wii remote Linux drivers using 'modprobe hid-wiimote'. To ensure this always gets loaded at boot time, add it to the modules-load.d configuration: 'echo hid-wiimote | sudo tee /etc/modules-load.d/wiimote.conf'.
 %
