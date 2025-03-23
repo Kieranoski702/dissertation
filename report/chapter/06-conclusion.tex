@@ -1,2 +1,24 @@
 \mychapter{7}{Conclusion}
 \label{chapter:conclusion}
+
+This dissertation has presented a comprehensive approach to adapting a classic local multiplayer experience for the modern era by bridging the gap between the Nintendo Wii’s original design and contemporary online gaming environments. The project’s core achievement lies in the development of a system that revitalises the Wii’s input and output interfaces - capturing audio and video with low latency, and relaying controller inputs over a network in real time.
+
+Key achievements of the project include:
+\begin{itemize}
+    \item The successful enhancement of the \texttt{WiimoteEmulator} project to support IR and accelerometer data, enabling the accurate emulation of Wii Remote inputs in a networked environment.
+    \item The implementation of a novel controller input relay system that processes and transmits IR, accelerometer, and button data using a low latency binary protocol.
+    \item The deployment of RTP-based audiovisual streaming techniques that balance media quality with the essential requirement of low latency, thereby preserving the authenticity of the Wii gaming experience.
+    \item The development of automation scripts that streamline the setup process, reducing the potential for manual errors and ensuring a reproducible environment across multiple devices.
+\end{itemize}
+
+Despite these successes, the project also encountered significant challenges and limitations. Notably, some latency issues remain, the project has not been thoroughly tested with more than 1 remote player, and other traditional Wii input devices such as nunchucks are not supported . Additionally, tuning the accelerometer to cater to different game-specific requirements, such as those observed in titles like Mario Kart, continues to present challenges. These drawbacks highlight areas where further research and development are necessary.
+
+Looking to the future, several directions could further enhance the system:
+\begin{itemize}
+    \item \textbf{Optimisation of Latency:} Future work could focus on further reducing latency through further enhancements to the \texttt{WiimoteEmulator}, improved network protocols, or more efficient data processing.
+    \item \textbf{Enhanced Accelerometer Calibration:} Refining the mathematical models and calibration procedures for accelerometer data may improve the accuracy and responsiveness of motion controls thus resulting in a more pleasant gaming experience.
+    \item \textbf{Broader Platform Support:} Expanding the framework to support additional retro consoles or other legacy input devices could broaden the system’s applicability and impact.
+    \item \textbf{User Interface Improvements:} Enhancing the interface for setup and control, possibly through graphical tools or integrated diagnostics, would further improve usability and adoption.
+\end{itemize}
+
+In summary, this project demonstrates a viable method for adapting a legacy gaming system to modern, distributed gaming environments while preserving the original charm and social dynamics of local multiplayer play. The work not only provides a framework for further experimentation and improvement but also contributes to the ongoing dialogue about preserving and revitalising classic gaming experiences in the digital age.
