@@ -51,7 +51,7 @@ The system is designed to recreate the local multiplayer experience of the Ninte
 
 \subsection*{Binary Protocol for Real-Time Communication}
 
-Instead of relying on verbose text-based protocols, the system employs a custom binary protocol to transmit sensor and button events over UDP. This design decision minimises overhead and latency, which are critical for real-time input relay. By defining fixed packet structures and using network byte order for float values, the system achieves a high level of efficiency in both packing and unpacking data. Such low-level control over the communication protocol is uncommon in similar projects and represents a key innovation in our design.
+Instead of relying on verbose text-based protocols, the system employs a custom binary protocol to transmit sensor and button events over UDP. This design decision minimises overhead and latency, which are critical for real-time input relay. By defining fixed packet structures and using network byte order for float values, the system achieves a high level of efficiency in both packing and unpacking data. Such low-level control over the communication protocol is uncommon in similar projects and represents a key innovation in the design.
 
 \subsection*{Modular and Extensible Input Processing}
 

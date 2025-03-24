@@ -41,7 +41,7 @@ A core component of the project is the emulation of the Wii Remote on the host R
 A fork of the project by JRogaishio\cite{jr_wiimote_emu} was selected as it fixes two critical bugs. The first
 bug is that the ip command in the original project was not working due to an index error. The second bug is that the original project was not compiling due to a call to \texttt{graceful\_disconnect()} which was not defined.
 
-My version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over the IP socket interface.
+The researcher's version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over the IP socket interface.
 
 \subsection*{Enhancements and Challenges}
 
@@ -73,7 +73,7 @@ Latency is a critical performance metric for both the audiovisual streaming and 
 
 \end{itemize}
 
-Despite these efforts, some latency issues remain—particularly in synchronising IR and accelerometer data with the audiovisual stream. Further work is needed to reduce processing overhead in the transformation routines (e.g., matrix inversions in \texttt{set\_accelerometer}) and to mitigate network jitter under varying conditions.
+Despite these efforts, some latency issues remain due to the inherent latency present in the \texttt{WiimoteEmulator}. Further work on the \texttt{WiimoteEmulator} project is needed to address these challenges and improve the overall responsiveness of the system.
 
 \section{Python Script for Input Relay}
 The system’s final major component is a custom Python script (\texttt{wiimote\_to\_emulator.py}) that serves as a bridge between the physical Wii Remote and the emulation backend running on the host Raspberry Pi. This script leverages the \texttt{xwiimote} Python bindings to interface directly with the Wii Remote hardware, continuously monitoring for various input events and relaying them to the Wii Remote Emulator via UDP.
@@ -81,7 +81,7 @@ The system’s final major component is a custom Python script (\texttt{wiimote\
 Key features and design details include:
 
 \subsection*{Wiimote Connection and Monitoring:}
-The script initializes a \texttt{xwiimote} monitor to detect when a Wii Remote is connected. Once a device is found, it creates an interface with the device and opens it for both reading and writing. This setup is essential to capture both analog events (e.g., accelerometer and IR data) and digital button presses.
+The script initialises a \texttt{xwiimote} monitor to detect when a Wii Remote is connected. Once a device is found, it creates an interface with the device and opens it for both reading and writing. This setup is essential to capture both analog events (e.g., accelerometer and IR data) and digital button presses.
 
 \subsection*{Non-Blocking I/O and Event Polling:}
 Using the \texttt{select.poll()} mechanism, the script sets up non-blocking I/O on the Wii Remote’s file descriptor. This allows the script to efficiently wait for input events without stalling the main event loop. When events are detected, the script calls \texttt{dev.dispatch(evt)} to process them.
@@ -111,13 +111,15 @@ Throughout the script, exceptions (such as I/O errors during event dispatching) 
 
 \section{Automation of Device Setup}
 
-To streamline the deployment process, a device setup script was developed. This script requires administrative privileges (sudo) and automates several critical configuration tasks, including:
+To streamline the deployment process, a device setup script (\texttt{setup.sh}) was developed. This script requires administrative privileges (sudo) and automates several critical configuration tasks, including:
 
 \begin{itemize}
 
 	\item Loading necessary kernel modules.
 	\item Editing system files (such as /etc/bluetooth/input.conf) to adjust Bluetooth settings.
 	\item Configuring environment variables and export paths for library dependencies.
+    \item Installing \texttt{xwiimote} and its Python bindings.
+    \item Downloading and compiling the custom Wii Remote Emulator.
 \end{itemize}
 
 By automating these tasks, the setup script minimises manual configuration errors and ensures a consistent environment across multiple devices.
