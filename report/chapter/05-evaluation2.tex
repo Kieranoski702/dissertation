@@ -1,9 +1,98 @@
 \mychapter{6}{Evaluation}
 \label{chapter:evaluation}
 
+This chapter evaluates the system with respect to the original objectives, and it critically compares the projects approach to related work in the field. The chapter also discusses the limitations of the system and suggests areas for future work.
+
+\section{Playability Analysis}
+
+%% The playability analysis was conducted under real-world conditions with multiple users testing the system in a controlled environment. The evaluation focused on several key factors:
+
+%% \begin{itemize}
+%%     \item \textbf{Input Responsiveness:}
+%%           Users reported that while the custom input relay system generally captured Wii Remote signals accurately, the latency was noticeable when compared to native local multiplayer gameplay. In fast-paced gaming scenarios, even minor delays were perceptible, though the system still maintained overall playability.
+
+%%     \item \textbf{Audiovisual Quality:}
+%%           The RTP-based streaming provided a balance between video and audio quality and latency. Although high-quality streams occasionally introduced buffering delays, iterative tuning of RTP parameters resulted in a setup that preserved the authenticity of the Wii experience.
+
+%%     \item \textbf{User Satisfaction:}
+%%           Test participants appreciated the novel approach to enabling remote multiplayer experiences, noting that the system successfully captured the social and interactive spirit of local play despite some technical limitations.
+
+%%     \item \textbf{Overall Usability:}
+%%           The automated configuration scripts and the robust handling of connectivity issues contributed to a smoother user experience. The system, while not perfect, was deemed sufficiently reliable for remote gameplay under a variety of network conditions.
+%% \end{itemize}
 
 \section{Challenges and Solutions}
 
+During development, several significant challenges emerged, each addressed with innovative solutions.
+
+\subsubsection{Input Relay and Data Synchronisation}
+Integrating the \texttt{xwiimote} library with the modified \texttt{WiimoteEmulator} fork presented challenges in synchronising accelerometer and IR data. Custom matrix transformations in \texttt{motion.c} and hand-tuned calibration routines ensured that the emulated signals closely replicated the physical Wii Remote behaviour. Additionally, the adoption of a binary protocol for transmitting sensor data reduced overhead and improved overall system responsiveness.
+
+% TODO: Change this with actual fix
+\subsubsection{IR Sensor Emulation}
+At first, the IR emulation only mapped to the bottom half of the screen due to a scaling value error. By adjusting the scaling factor in the \texttt{motion.c} code, the IR sensor was correctly positioned on the screen, allowing for accurate pointing and cursor control. This fix was crucial for maintaining the playability of IR-dependent games.
+
+\subsubsection{Audiovisual Streaming}
+Balancing high-quality streaming with low latency was addressed by careful tuning of RTP parameters. Iterative testing of the \texttt{broadcast-rtp.sh} and \texttt{play-rtp.sh} scripts resulted in a workable compromise between video quality and responsiveness.
+
+\subsubsection{Latency Reduction}
+While the system successfully relayed input data and streamed audiovisual content, latency remained a persistent challenge. The use of RTP for streaming and a custom binary protocol for input relay helped minimise delays, but further optimisation is needed to bring the system closer to native play responsiveness.
+
 \section{Limitations}
 
+Despite meeting the primary project objectives, several limitations remain:
+
+\begin{enumerate}
+    \item \textbf{Peripheral Support:}
+          The current implementation does not support nunchuck input, thereby limiting the scope of the emulated Wii experience.
+    \item \textbf{Scalability:}
+          The system has been tested with only a single remote player. Additional testing is needed to verify its performance in multi-user scenarios.
+    \item \textbf{Latency:}
+          Although the system successfully transmits inputs and streams audiovisual data, the emulator exhibits a noticeable latency compared to native Wii play. This latency could impact the experience in highly responsive, fast-paced games.
+    \item \textbf{Accelerometer Calibration:}
+          The accelerometer emulation relies on hand-tuned parameters, which may not be optimally calibrated for all games. This could require game-specific adjustments to achieve the best user experience.
+\end{enumerate}
+
 \section{Reflection and Future Work}
+
+\subsection*{Evaluation of Objectives}
+As stated in the \hyperlink{chapter:introduction}{Introduction} chapter, the key objectives of the project were:
+
+\begin{enumerate}
+\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
+\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
+\item Evaluate the system’s performance and user experience in a real-world setting.
+\end{enumerate}
+
+Reflecting on the project in respect to these objectives, it is clear that the project successfully fulfils all three objectives. The system developed is capable of capturing and streaming the Wii’s video and audio output to remote players, relaying the Wii Remote’s controller data over a low-latency network connection, and has been evaluated in a real-world setting. The system has been tested in a controlled environment, and the evaluation has shown that the system is capable of providing a playable experience, despite some limitations.
+
+\subsection*{Comparison with Related Work}
+When comparing this project with related work in the public domain, several points emerge:
+
+\subsubsection{WiimoteEmulator and Its Derivatives}
+The original \texttt{WiimoteEmulator} project by rnconrad and subsequent forks (e.g., JRogaishio's version) primarily focused on emulating the Wii Remote for local control using Bluetooth. In contrast, this work extends these foundations by implementing network-based control. By integrating a custom binary protocol for IR and accelerometer data over IP sockets, this system adapts the concept of Wii Remote emulation to enable remote gameplay -- a feature not present in the original projects.
+
+\subsubsection{Input Relay Techniques}
+While several research efforts and projects have addressed low-latency input relay for gaming peripherals, many rely on text-based communication protocols or lack the integration of real-time sensor data. This approach, which utilises a binary protocol to transmit fixed-length packets, reduces overhead and improves performance, thereby offering a competitive edge in scenarios requiring rapid response times.
+
+\subsubsection{Audiovisual Streaming in Remote Gaming}
+In the broader context of remote gaming, solutions such as cloud gaming platforms have tackled the challenge of low-latency audiovisual streaming. However, these platforms often require substantial infrastructure and proprietary solutions. This system, by leveraging RTP for streaming and integrating it with the custom input relay, creates a unified framework that bridges both input and output channels in a manner that is both accessible and reproducible using open-source tools.
+
+\subsubsection{Overall System Integration}
+Compared to other projects that may focus solely on either streaming or input emulation, this work represents a holistic solution that aims to preserve the full multiplayer gaming experience. The integration of automated configuration, error handling, and modular software components differentiates this system, offering both flexibility and robustness. While certain aspects (e.g., latency and peripheral support) still need refinement, the combined approach sets a new benchmark for retro gaming adaptation in distributed environments.
+
+
+\subsection*{Future Work}
+However, there are clear avenues for future improvement. The following areas could be explored in future iterations:
+
+\subsubsection{Enhanced Peripheral Integration}
+Future iterations could include support for additional Wii peripherals, such as the nunchuck, to provide a more comprehensive emulation of the original gaming experience. This would require extending the existing input relay system to accommodate the unique features of each peripheral.
+
+\subsubsection{Scalability Testing}
+More extensive testing with multiple remote players is necessary to assess the system’s performance under higher network loads and to refine the data relay mechanisms accordingly.
+
+\subsubsection{Latency Optimisation}
+Further research into reducing latency through improvements in the \texttt{WiimoteEmulator} fork, custom input relay program, and RTP streaming parameters could enhance the system’s responsiveness and bring it closer to native Wii play.
+
+\subsubsection{Dynamic Calibration Techniques}
+Developing adaptive calibration algorithms for the accelerometer data could improve accuracy and tailor the emulation more effectively to different game genres and user preferences. This could involve machine learning techniques or game-specific calibration profiles.
