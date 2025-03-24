@@ -3,7 +3,6 @@
 - Reduce emulator latency by switching to pure byte protocol for button input?
 - Write evaluation
 - Make data flow diagram to be used as figure in section 4.2
-- Change binary data format to use 01 for IR and 02 for Accel then update mentions of the format to reflect this
 
 - Write a complete installer script
 - Write a complete host script
