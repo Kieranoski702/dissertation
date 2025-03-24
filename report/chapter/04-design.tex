@@ -34,7 +34,7 @@ The system’s architecture emphasises clear data flow and modularity. Figure%% 
           In the Python script, events are handled in a non-blocking manner using \texttt{select.poll()}. The script processes each event by normalising sensor data and mapping it into the expected range. For example, IR data is normalised to a [0,1] scale and then converted to a resolution that matches the Wii’s requirements, while accelerometer data is similarly scaled.
 
     \item \textbf{Packet Formation and Transmission:}
-          Processed events are packaged into binary data packets. The design utilises fixed-length packets with a dedicated header byte to distinguish between different types of events (e.g., \texttt{0x01} for pointer updates, \texttt{0x02} for IR, \texttt{0x03} for accelerometer data). These packets are transmitted over UDP to the emulator, which interprets them to simulate the corresponding inputs.
+          Processed events are packaged into binary data packets. The design utilises fixed-length packets with a dedicated header byte to distinguish between different types of events (e.g., \texttt{0x01} for IR and \texttt{0x02} for accelerometer data). These packets are transmitted over UDP to the emulator, which interprets them to simulate the corresponding inputs.
 
     \item \textbf{Emulation and Output:}
           The emulator on the host Raspberry Pi receives the UDP packets and integrates the data into its internal state. The emulation layer uses transformation routines to convert the incoming data into the simulated state of the Wii Remote, including generating IR positions and accelerometer readings.

@@ -89,15 +89,15 @@ Using the \texttt{select.poll()} mechanism, the script sets up non-blocking I/O 
 \subsection*{Event Processing and Binary Packet Formation:}
 Depending on the event type, the script processes the data accordingly:
 \subsubsection*{Accelerometer Events}
-When an accelerometer event is received (identified by \texttt{xwiimote.EVENT\_ACCEL}), the script retrieves the raw accelerometer values from channel 0. It then normalizes these values (using a custom scaling and offset transformation) and packs them into a binary packet with the header \texttt{0x03}. The binary format is:
+When an accelerometer event is received (identified by \texttt{xwiimote.EVENT\_ACCEL}), the script retrieves the raw accelerometer values from channel 0. It then normalizes these values (using a custom scaling and offset transformation) and packs them into a binary packet with the header \texttt{0x02}. The binary format is:
 \begin{center}
-	\texttt{[1 byte event type (0x03)] + [4 bytes float ax] +}
+	\texttt{[1 byte event type (0x02)] + [4 bytes float ax] +}
 	\texttt{[4 bytes float ay] + [4 bytes float az]}
 \end{center}
 \subsubsection*{IR Events:}
-For IR events (identified by \texttt{xwiimote.EVENT\_IR}), the script retrieves the IR coordinates and normalizes them to a [0,1] range. It then packs the data into a binary packet with header \texttt{0x02}:
+For IR events (identified by \texttt{xwiimote.EVENT\_IR}), the script retrieves the IR coordinates and normalizes them to a [0,1] range. It then packs the data into a binary packet with header \texttt{0x01}:
 \begin{center}
-	\texttt{[1 byte event type (0x02)] + [4 bytes float x] +}
+	\texttt{[1 byte event type (0x01)] + [4 bytes float x] +}
 	\texttt{[4 bytes float y] + [4 bytes float z]}
 \end{center}
 \subsubsection*{Button (Key) Events:}
