@@ -28,9 +28,20 @@ During development, several significant challenges emerged, each addressed with 
 \subsubsection{Input Relay and Data Synchronisation}
 Integrating the \texttt{xwiimote} library with the modified \texttt{WiimoteEmulator} fork presented challenges in synchronising accelerometer and IR data. Custom matrix transformations in \texttt{motion.c} and hand-tuned calibration routines ensured that the emulated signals closely replicated the physical Wii Remote behaviour. Additionally, the adoption of a binary protocol for transmitting sensor data reduced overhead and improved overall system responsiveness.
 
-% TODO: Change this with actual fix
 \subsubsection{IR Sensor Emulation}
-At first, the IR emulation only mapped to the bottom half of the screen due to a scaling value error. By adjusting the scaling factor in the \texttt{motion.c} code, the IR sensor was correctly positioned on the screen, allowing for accurate pointing and cursor control. This fix was crucial for maintaining the playability of IR-dependent games.
+At first, the IR emulation only mapped to the bottom half of the screen due to a scaling value error.
+
+Originally, the vector for the three IR coordinates in the Wiimote emulators 3D space was as follows:
+\begin{lstlisting}[style=CStyle, emph={vec3}, emphstyle={\color{magenta}}]
+vec3 pointer_world = {(pointer_x - 0.5) * screen_width, (pointer_y - 0.5) * screen_width / screen_aspect, -screen_distance};
+\end{lstlisting}
+
+Changing removing the constant -0.5 and the screen aspect ratio from the y-coordinate calculation fixed the issue:
+\begin{lstlisting}[style=CStyle, emph={vec3}, emphstyle={\color{magenta}}]
+vec3 pointer_world = {(pointer_x - 0.5) * screen_width, (pointer_y)*screen_width, -screen_distance};
+\end{lstlisting}
+
+By correcting this error, the IR sensor data was correctly positioned on the screen, allowing for accurate pointing and cursor control. This fix was crucial for maintaining the playability of IR-dependent games.
 
 \subsubsection{Audiovisual Streaming}
 Balancing high-quality streaming with low latency was addressed by careful tuning of RTP parameters. Iterative testing of the \texttt{broadcast-rtp.sh} and \texttt{play-rtp.sh} scripts resulted in a workable compromise between video quality and responsiveness.
