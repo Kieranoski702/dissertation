@@ -1,0 +1,27 @@
+\chapter{Software Engineering Process}
+\label{chapter:sep}
+
+
+The development of this project was guided by the waterfall methodology\cite{royce1987managing}. Given the fixed deadline and the fact that the project was developed by a single individual, a sequential, plan-driven approach was deemed the most appropriate. Unlike iterative or Agile\cite{atlassian2025agile} methods -- which offer continuous deployment and rapid iterations -- the waterfall model allowed for clear delineation of phases and ensured that each stage of the project was fully completed and documented before progressing to the next.
+
+\section{Software Development Approach}
+
+The waterfall methodology was selected due to two primary reasons:
+\begin{enumerate}
+	\item \textbf{Fixed Deadline:} With a single, non-negotiable deadline for delivering the complete system, the sequential nature of the waterfall model ensured that all project requirements were addressed in a structured manner. Each phase built on the preceding one, allowing for a well-planned progression from concept to final implementation.
+	\item \textbf{Single Developer Environment:} Since the project was executed by a single developer, the need for complex coordination and iterative refinement -- common in multi-developer or Agile environments -- was significantly reduced. This environment favoured a more traditional approach where requirements, design, implementation, and testing followed in a linear sequence.
+\end{enumerate}
+
+The development process began with a comprehensive requirements specification that defined the system’s objectives, such as revitalising the Wii’s input and output interfaces for remote multiplayer gaming. Following this, the design phase was initiated, during which the overall architecture was established.
+
+The development of this project was guided by the waterfall methodology. Given the fixed deadline and the fact that the project was developed by a single individual, a sequential, plan-driven approach was deemed the most appropriate. Unlike iterative or Agile methods -- which offer continuous deployment and rapid iterations -- the waterfall model allowed for clear delineation of phases and ensured that each stage of the project was fully completed and documented before progressing to the next.
+
+\section{Tools and Technologies}
+
+To implement this project, several tools and technologies were chosen based on their suitability and the developer’s familiarity. These include:
+
+\subsubsection{Programming Languages:}
+The \texttt{WiimoteEmulator} project uses C, while Python was employed for higher-level tasks including input relay and automation. Bash scripts were used to automate system configuration and setup.
+
+\subsubsection{Build and Deployment Tools:}
+Git was used for version control, ensuring that all source code and documentation were managed efficiently. Automated scripts were created to handle environment configuration -- loading necessary kernel modules, modifying Bluetooth settings, and setting environment variables such as \texttt{LD\_LIBRARY\_PATH}.

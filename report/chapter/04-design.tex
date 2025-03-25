@@ -1,4 +1,4 @@
-\mychapter{4}{Design}
+\chapter{Design}
 \label{chapter:design}
 
 This chapter presents an in-depth discussion of the system's design, examining the overall architecture, the rationale behind key design decisions, and the unique aspects that distinguish this project. The design of the system is inherently modular, partitioning functionality into clearly defined subsystems that interact through well-specified interfaces. This approach not only promotes ease of development and testing but also facilitates future expansion and maintenance.
@@ -57,9 +57,9 @@ Several aspects of the system’s design stand out due to their innovative natur
 The system is designed to recreate the local multiplayer experience of the Nintendo Wii in an online setting. By combining audiovisual streaming with real-time input relay, the project aims to provide a seamless and authentic gaming experience that captures the essence of the original console. The project is easy to setup and use due to the automation scripts removing the need for advanced technical knowledge. This holistic approach to reviving the multiplayer capabilities of the Nintendo Wii is unique and distinguishes the project from other remote gaming solutions.
 
 
-\subsection*{Binary Protocol for Real-Time Communication}
+%% \subsection*{Binary Protocol for Real-Time Communication}
 
-Instead of relying on verbose text-based protocols, the system employs a custom binary protocol to transmit sensor and button events over UDP. This design decision minimises overhead and latency, which are critical for real-time input relay. By defining fixed packet structures and using network byte order for float values, the system achieves a high level of efficiency in both packing and unpacking data. Such low-level control over the communication protocol is uncommon in similar projects and represents a key innovation in the design.
+%% Instead of relying on verbose text-based protocols, the system employs a custom binary protocol to transmit sensor and button events over UDP. This design decision minimises overhead and latency, which are critical for real-time input relay. By defining fixed packet structures and using network byte order for float values, the system achieves a high level of efficiency in both packing and unpacking data. Such low-level control over the communication protocol is uncommon in similar projects and represents a key innovation in the design.
 
 \subsection*{Modular and Extensible Input Processing}
 
