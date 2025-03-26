@@ -3,30 +3,32 @@
 
 \section{Functional Requirements}
 
-\subsubsection{Video and Audio Capture and Streaming:}
-	      The system shall capture the Wii’s video and audio outputs and stream them to remote players with minimal latency. This functionality is critical to preserve the fluid, immersive experience typical of classic Wii titles.
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|p{1cm}|p{3cm}|p{6cm}|p{5cm}|}
+      \hline
+        Req. ID & Title & Description & Rationale/Justification \\ \hline
+        FR-01 & Video and Audio Capture and Streaming & Capture the Wii’s video and audio outputs and stream them to remote players with minimal latency. & Preserve the immersive experience of classic Wii titles by ensuring rapid, high-quality audiovisual delivery that maintains game fluidity. \\ \hline
+        FR-02 & Controller Input Relay & Capture Wii Remote inputs—including motion data and button presses—and transmit them over a low-latency network connection with reliable bi-directional communication. & Ensure real-time responsiveness in interactive gameplay by providing prompt and accurate relay of user inputs, thereby supporting dynamic and engaging play. \\ \hline
+        FR-03 & Synchronisation & Synchronise audiovisual data with controller inputs by dynamically adjusting for network variability and timing discrepancies. & Replicate local multiplayer dynamics and guarantee a seamless gaming experience by aligning all input and output streams in real time. \\ \hline
+        FR-04 & Performance & Operate under strict low-latency conditions by minimising delay and jitter using efficient processing and optimised data streaming protocols. & Maintain the quality of interactive gameplay by ensuring that system operations consistently meet performance targets, thereby reducing disruptions and lag. \\ \hline
+    \end{tabular}
+    \caption{Functional Requirements}
+    \label{tab:functional-requirements}
+\end{table}
 
-\subsubsection{Controller Input Relay:}
-	      The solution must reliably capture and transmit Wii Remote inputs—including motion data and button presses—over a low-latency network connection. This bi-directional communication is essential for maintaining the real-time responsiveness expected in interactive gameplay.
-
-\subsubsection{Synchronization:}
-	      To ensure a seamless gaming experience, audiovisual data and controller inputs must be synchronised. The system should adjust for network variability and maintain precise timing to replicate local multiplayer dynamics.
-
-
-
-
+\pagebreak
 \section{Non-Functional Requirements}
 
-\subsubsection{Performance:}
-	      The system must operate under strict low-latency conditions to minimise delay and jitter. Efficient processing and optimised data streaming protocols are required.
-
-\subsubsection{Reliability and Robustness:}
-	      The solution should tolerate variations in network quality, ensuring continuous, stable operation even under less-than-ideal conditions.
-
-\subsubsection{Accessability:}
-	      An intuitive interface and straightforward setup process should be provided, enabling users to connect and enjoy games with minimal technical intervention.
-
-\subsubsection{Evaluation:}
-	      Comprehensive testing in real-world environments is necessary. Both quantitative performance metrics and qualitative user feedback will be gathered to assess the overall experience.
-
-
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|p{1cm}|p{3cm}|p{6cm}|p{5cm}|}
+    \hline
+        Req. ID & Title & Description & Rationale/Justification \\ \hline
+        NFR-01 & Reliability and Robustness & Tolerate variations in network quality while maintaining continuous and stable operation under sub-optimal conditions. & Enhance system dependability by accommodating fluctuations in network performance, which is essential for uninterrupted gaming experiences. \\ \hline
+        NFR-02 & Accessibility & Provide an intuitive interface and a straightforward setup process that enables easy connectivity and configuration without extensive technical effort. & Increase usability and lower technical barriers, allowing a broader range of users to enjoy the gaming experience without specialised assistance. \\ \hline
+        NFR-03 & Evaluation & Conduct comprehensive testing in real-world environments and gather both quantitative performance metrics and qualitative user feedback. & Validate overall system performance and quality through systematic assessment, facilitating informed decisions for iterative improvements and refinement. \\ \hline
+    \end{tabular}
+    \caption{Non-Functional Requirements}
+    \label{tab:non-functional-requirements}
+\end{table}

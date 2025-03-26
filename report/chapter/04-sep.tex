@@ -2,26 +2,34 @@
 \label{chapter:sep}
 
 
-The development of this project was guided by the waterfall methodology\cite{royce1987managing}. Given the fixed deadline and the fact that the project was developed by a single individual, a sequential, plan-driven approach was deemed the most appropriate. Unlike iterative or Agile\cite{atlassian2025agile} methods -- which offer continuous deployment and rapid iterations -- the waterfall model allowed for clear delineation of phases and ensured that each stage of the project was fully completed and documented before progressing to the next.
+Development followed the waterfall methodology\cite{royce1987managing}. This structured, sequential model fit the constraints of a fixed deadline and a single-developer workflow. Unlike Agile or iterative models\cite{atlassian2025agile}, which encourage continuous delivery and rapid prototyping, the waterfall approach provided distinct stages, enabling full completion and documentation of each phase before moving forward.
 
 \section{Software Development Approach}
 
-The waterfall methodology was selected due to two primary reasons:
+The waterfall model supported the project in two key ways:
 \begin{enumerate}
-	\item \textbf{Fixed Deadline:} With a single, non-negotiable deadline for delivering the complete system, the sequential nature of the waterfall model ensured that all project requirements were addressed in a structured manner. Each phase built on the preceding one, allowing for a well-planned progression from concept to final implementation.
-	\item \textbf{Single Developer Environment:} Since the project was executed by a single developer, the need for complex coordination and iterative refinement -- common in multi-developer or Agile environments -- was significantly reduced. This environment favoured a more traditional approach where requirements, design, implementation, and testing followed in a linear sequence.
+	\item \textbf{Fixed Deadline:} A single, non-negotiable deadline for delivering the complete system demanded a structured approach, and the sequential nature of the waterfall model addressed all project requirements methodically. Each phase built upon the previous one, enabling a well-planned progression from concept to final implementation.
+
+	\item \textbf{Single Developer Environment:} The lack of team coordination requirements made the overhead of Agile methods, such as complex coordination and iterative refinement, unnecessary. Instead, linear development -- where requirements, design, implementation, and testing followed in sequence -- offered clarity and focus, streamlining the process.
+
 \end{enumerate}
 
-The development process began with a comprehensive requirements specification that defined the system’s objectives, such as revitalising the Wii’s input and output interfaces for remote multiplayer gaming. Following this, the design phase was initiated, during which the overall architecture was established.
-
-The development of this project was guided by the waterfall methodology. Given the fixed deadline and the fact that the project was developed by a single individual, a sequential, plan-driven approach was deemed the most appropriate. Unlike iterative or Agile methods -- which offer continuous deployment and rapid iterations -- the waterfall model allowed for clear delineation of phases and ensured that each stage of the project was fully completed and documented before progressing to the next.
+The process began with a detailed requirements specification, outlining goals and objectives for the system. The design phase followed, defining system architecture and planning integration points across subsystems.
 
 \section{Tools and Technologies}
 
-To implement this project, several tools and technologies were chosen based on their suitability and the developer’s familiarity. These include:
+\subsection{Programming Languages}
 
-\subsubsection{Programming Languages:}
-The \texttt{WiimoteEmulator} project uses C, while Python was employed for higher-level tasks including input relay and automation. Bash scripts were used to automate system configuration and setup.
+The project uses a combination of C, Python, and Bash to target system-level performance, ease of integration, and automation.
 
-\subsubsection{Build and Deployment Tools:}
-Git was used for version control, ensuring that all source code and documentation were managed efficiently. Automated scripts were created to handle environment configuration -- loading necessary kernel modules, modifying Bluetooth settings, and setting environment variables such as \texttt{LD\_LIBRARY\_PATH}.
+\subsubsection{C}
+Chosen for low-level hardware interaction and performance-critical components. The existing \texttt{WiimoteEmulator}, originally implemented in C, required extended functionality -- best achieved by maintaining the same language to ensure compatibility, reduce overhead, and optimise latency. Consideration went to alternatives such as C++ or Rust; however, C++ introduced unnecessary abstraction for a project of this scope, and Rust's stricter compile-time checks and learning curve made it less suitable within the project's time constraints.
+
+\subsubsection{Python}
+Used for the input relay system. Python enabled rapid development of code to handle Bluetooth connectivity, input detection, and communication with the host machine. Its extensive libraries and readability made it ideal for writing higher-level control scripts. Languages like Java or Node.js fell out of consideration due to limited library support and less straightforward integration with low-level system components.
+
+\subsubsection{Bash}
+Utilised for system configuration and environment setup. A Bash script automates the configuration of the development environment, installation of dependencies, and compilation of the C codebase. This allowed reproducible builds and simplified development environment setup. While Python could also perform these tasks, Bash offered a more concise and native approach for shell-level automation.
+
+\subsection{Build and Deployment Tools}
+Version control through Git supported code integrity, traceability, and collaboration-readiness, even in a single-developer context. Tracking each change allowed for reliable rollback, documentation of evolution, and structured branching for experimental features. Git also ensured compatibility with deployment tools and safeguarded against data loss across environments. The ability to manage different stages of development through commits and tags proved essential for both incremental testing and final delivery.

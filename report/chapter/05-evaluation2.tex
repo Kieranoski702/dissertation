@@ -54,30 +54,30 @@ While the system successfully relayed input data and streamed audiovisual conten
 Despite meeting the primary project objectives, several limitations remain:
 
 \begin{enumerate}
-    \item \textbf{Peripheral Support:}
-          The current implementation does not support nunchuck input, thereby limiting the scope of the emulated Wii experience.
-    \item \textbf{Scalability:}
-          The system has been tested with only a single remote player. Additional testing is needed to verify its performance in multi-user scenarios.
-    \item \textbf{Latency:}
-          Although the system successfully transmits inputs and streams audiovisual data, the emulator exhibits a noticeable latency compared to native Wii play. This latency could impact the experience in highly responsive, fast-paced games.
-    \item \textbf{Accelerometer Calibration:}
-          The accelerometer emulation relies on hand-tuned parameters, which may not be optimally calibrated for all games. This could require game-specific adjustments to achieve the best user experience.
+	\item \textbf{Peripheral Support:}
+	      The current implementation does not support nunchuck input, thereby limiting the scope of the emulated Wii experience.
+	\item \textbf{Scalability:}
+	      The system has been tested with only a single remote player. Additional testing is needed to verify its performance in multi-user scenarios.
+	\item \textbf{Latency:}
+	      Although the system successfully transmits inputs and streams audiovisual data, the emulator exhibits a noticeable latency compared to native Wii play. This latency could impact the experience in highly responsive, fast-paced games.
+	\item \textbf{Accelerometer Calibration:}
+	      The accelerometer emulation relies on hand-tuned parameters, which may not be optimally calibrated for all games. This could require game-specific adjustments to achieve the best user experience.
 \end{enumerate}
 
 \section{Reflection and Future Work}
 
-\subsection*{Evaluation of Objectives}
+\subsection{Evaluation of Objectives}
 As stated in the \hyperlink{chapter:introduction}{Introduction} chapter, the key objectives of the project were:
 
 \begin{enumerate}
-\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
-\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
-\item Evaluate the system’s performance and user experience in a real-world setting.
+	\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
+	\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
+	\item Evaluate the system’s performance and user experience in a real-world setting.
 \end{enumerate}
 
 Reflecting on the project in respect to these objectives, it is clear that the project successfully fulfils all three objectives. The system developed is capable of capturing and streaming the Wii’s video and audio output to remote players, relaying the Wii Remote’s controller data over a low-latency network connection, and has been evaluated in a real-world setting. The system has been tested in a controlled environment, and the evaluation has shown that the system is capable of providing a playable experience, despite some limitations.
 
-\subsection*{Comparison with Related Work}
+\subsection{Comparison with Related Work}
 When comparing this project with related work in the public domain, several points emerge:
 
 \subsubsection{WiimoteEmulator and Its Derivatives}
@@ -93,7 +93,7 @@ In the broader context of remote gaming, solutions such as cloud gaming platform
 Compared to other projects that may focus solely on either streaming or input emulation, this work represents a holistic solution that aims to preserve the full multiplayer gaming experience. The integration of automated configuration, error handling, and modular software components differentiates this system, offering both flexibility and robustness. While certain aspects (e.g., latency and peripheral support) still need refinement, the combined approach sets a new benchmark for retro gaming adaptation in distributed environments.
 
 
-\subsection*{Future Work}
+\subsection{Future Work}
 However, there are clear avenues for future improvement. The following areas could be explored in future iterations:
 
 \subsubsection{Enhanced Peripheral Integration}
