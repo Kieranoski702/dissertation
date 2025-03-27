@@ -7,7 +7,11 @@ This section surveys the broader context of the project by reviewing the histori
 Nintendo released the Wii in 2006, quickly earning acclaim for its innovative motion-based controls and engaging game library. Central to its appeal was the Wii Remote (Wiimote), a wireless controller equipped with accelerometers, infrared sensors, and traditional button inputs. These features enabled intuitive, physical interactions, helping to bridge the gap between digital gameplay and physical movement. Over time, the Wii’s local multiplayer format -- often characterised by split-screen or shared-screen experiences -- solidified its reputation as a console focused on communal play. In 2014, Nintendo shut down the Wii’s online services\cite{nintendoTerminationNintendo}, officially ending support for online multiplayer. As a result, third-party solutions, like \textit{Nintendo Wii over IP}, remain the only way to play Wii games online.
 
 \section{Relevant Hardware and Software Technologies}
-The project draws on a range of hardware and software technologies to achieve its objectives. Key technologies include:
+The project draws on a range of hardware and software technologies to achieve its objectives. Figure~\ref{fig:context_survey} shows a modified version of Figure~\ref{fig:expanded_overview} that highlights where the key technologies fit into the system architecture.
+
+
+% \vspace{40 mm}
+Key technologies include:
 
 \subsubsection{\texttt{WiimoteEmulator}\cite{wiimote_emulator}}
 The open-source \texttt{WiimoteEmulator} project on GitHub emulates Wii Remote signals, allowing a real Wii console to interface with a computer acting as an external controller. By replicating the Wiimote’s communication protocol, it lays the groundwork for experimenting with alternative input methods. For this dissertation, I extended a fork of \texttt{WiimoteEmulator} to accept infrared and accelerometer data over a network. This enhancement plays a crucial role in linking remote inputs with local emulation.
@@ -20,6 +24,14 @@ The Raspberry Pi serves as a versatile, low-cost computing platform that support
 
 \subsubsection{\texttt{xwiimote} Library\cite{xwiimote}}
 To capture real Wiimote input, the system uses the \texttt{xwiimote} library. Running on a Raspberry Pi, this library interfaces physical Wiimote hardware with software, enabling the system to capture and process motion and button data. A custom Python script then routes this data through the extended emulation system, ensuring correct interpretation of remote control signals.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=1\textwidth]{context_survey.jpg}
+	\caption{Overview of the System with Key Technologies Linked}
+	\label{fig:context_survey}
+\end{figure}
+
 
 
 \section{Recent Work and Similar Endeavours}

@@ -5,13 +5,13 @@
 
 \begin{table}[!ht]
     \centering
-    \begin{tabular}{|p{1cm}|p{3cm}|p{6cm}|p{5cm}|}
+    \begin{tabular}{|p{1cm}|p{3cm}|p{5cm}|p{6cm}|}
       \hline
         Req. ID & Title & Description & Rationale/Justification \\ \hline
-        FR-01 & Video and Audio Capture and Streaming & Capture the Wii’s video and audio outputs and stream them to remote players with minimal latency. & Preserve the immersive experience of classic Wii titles by ensuring rapid, high-quality audiovisual delivery that maintains game fluidity. \\ \hline
-        FR-02 & Controller Input Relay & Capture Wii Remote inputs—including motion data and button presses—and transmit them over a low-latency network connection with reliable bi-directional communication. & Ensure real-time responsiveness in interactive gameplay by providing prompt and accurate relay of user inputs, thereby supporting dynamic and engaging play. \\ \hline
-        FR-03 & Synchronisation & Synchronise audiovisual data with controller inputs by dynamically adjusting for network variability and timing discrepancies. & Replicate local multiplayer dynamics and guarantee a seamless gaming experience by aligning all input and output streams in real time. \\ \hline
-        FR-04 & Performance & Operate under strict low-latency conditions by minimising delay and jitter using efficient processing and optimised data streaming protocols. & Maintain the quality of interactive gameplay by ensuring that system operations consistently meet performance targets, thereby reducing disruptions and lag. \\ \hline
+      FR-01 & Video and Audio Capture and Streaming & Capture the Wii’s video and audio outputs and stream them to remote players with minimal latency. & Enable remote players to experience the game in real-time by providing audiovisual data. If the remote user could not see or hear the game, the project would be non-functional. \\ \hline
+      FR-02 & Controller Input Relay & Capture Wii Remote inputs -- including motion data and button presses -- and transmit them over a low-latency network connection. & Allow remote players to interact with the game in real-time by relaying controller inputs, without which the project would be non-functional. \\ \hline
+      FR-03 & Wii Remote Emulation & Emulate the remote user's Wii Remote inputs through a local Bluetooth connection to the Wii console. & Enable remote players to control the game as if they were physically present by emulating controller inputs. Without this feature, the project would be non-functional. \\ \hline
+      FR-04 & Performance & Operate under strict low-latency conditions by minimising delay and jitter using efficient processing and optimised data streaming protocols. & Ensure a responsive and immersive gaming experience by reducing latency and maintaining consistent performance, which is crucial for real-time gameplay. If latency is too high, the game will be unplayable. \\ \hline
     \end{tabular}
     \caption{Functional Requirements}
     \label{tab:functional-requirements}
@@ -22,12 +22,12 @@
 
 \begin{table}[!ht]
     \centering
-    \begin{tabular}{|p{1cm}|p{3cm}|p{6cm}|p{5cm}|}
+    \begin{tabular}{|p{1cm}|p{3cm}|p{5cm}|p{6cm}|}
     \hline
         Req. ID & Title & Description & Rationale/Justification \\ \hline
         NFR-01 & Reliability and Robustness & Tolerate variations in network quality while maintaining continuous and stable operation under sub-optimal conditions. & Enhance system dependability by accommodating fluctuations in network performance, which is essential for uninterrupted gaming experiences. \\ \hline
         NFR-02 & Accessibility & Provide an intuitive interface and a straightforward setup process that enables easy connectivity and configuration without extensive technical effort. & Increase usability and lower technical barriers, allowing a broader range of users to enjoy the gaming experience without specialised assistance. \\ \hline
-        NFR-03 & Evaluation & Conduct comprehensive testing in real-world environments and gather both quantitative performance metrics and qualitative user feedback. & Validate overall system performance and quality through systematic assessment, facilitating informed decisions for iterative improvements and refinement. \\ \hline
+        NFR-03 & Evaluation & Conduct comprehensive testing in real-world environments and gather both quantitative performance metrics. & Validate overall system performance and quality through systematic assessment, facilitating informed decisions for iterative improvements and refinement. \\ \hline
     \end{tabular}
     \caption{Non-Functional Requirements}
     \label{tab:non-functional-requirements}

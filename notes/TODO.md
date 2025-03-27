@@ -14,28 +14,17 @@
   
 Questions for Tom:
 
-- Word count? Is 5000-8000 a fine range for this type of project
-- Kinda repeating myself a lot in report? Is that fine?
-- Need to add a whole ethics chapter? Is ethics form as appendix enough to not need a whole chapter?
-- Software engineering process chapter? I didn't have one and don't think it is worth talking about
-- Can you read over this draft? Not done the full testing or full evaluation of gaming experience/playability
-- If I get those done before the 4th of April, how many days notice would it have to be for you to look over those sections before submitting?
+- Is requirements table correct format?
+- Should reference to figure 1.2 in design section be a duplication of the figure insetad?
 - How can I do playability testing? I looked at the paper which talks about interaction lag which I might be able to measure but would be hard to get the latency between the wii performing the action and seeing the action over hdmi. Other than this what other playability testing can I do?
 - Do I need a testing summary? 
-
-
-- Simple intro figure
-- Another figure in context survey (perhaps built on top of simple intro figure) that links the tech to the components
-- Fix requirements. Most justifications don't make sense. Some requirements like synchronisation don't make sense.
-- Ask if requirements table is correct
 
 Things to do:
 - Too fluffy - too many weasel words
 - Build on the figure over time
-- Why wouldn't people use network play
 - More detail
-- Background stuff needs to be cited
-- Formal requirements specification table
+- More citations?
+
 - Delve into each objective in eval
 - How limitations could be overcome
 - Potential experiment - record tow screens one which goes through the whole thing (capture device, cables, network) and one that just has straight input from wii. Record both then press button. Check frame by frame for time difference
