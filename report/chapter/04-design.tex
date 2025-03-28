@@ -1,73 +1,128 @@
 \chapter{Design}
 \label{chapter:design}
 
-This chapter presents an in-depth discussion of the system's design, examining the overall architecture, the rationale behind key design decisions, and the unique aspects that distinguish this project. The design of the system is inherently modular, partitioning functionality into clearly defined subsystems that interact through well-specified interfaces. This approach not only promotes ease of development and testing but also facilitates future expansion and maintenance.
+This chapter presents an in-depth discussion of the system's design, examining
+the overall architecture, the rationale behind key design decisions, and the
+unique aspects that distinguish this project. The design of the system is
+inherently modular, partitioning functionality into defined subsystems that
+interact through well-specified interfaces. This approach not only promotes ease
+of development and testing but also facilitates future expansion and
+maintenance.
 
 \section{System Architecture Overview}
 
-At a high level, the system comprises several loosely coupled components that work together to recreate a local multiplayer experience in a remote gaming context. The primary subsystems include:
+At a high level, the system comprises several loosely coupled components that
+work together to recreate a local multiplayer experience in a remote gaming
+context. Figure~\ref{fig:expanded_overview} illustrates the primary components
+and their interactions.
 
+The primary subsystems include:
 \begin{itemize}
 	\item \textbf{Controller Input Relay}
-	      A custom Python script acts as an intermediary, capturing input events (such as accelerometer data, IR signals, and button presses) using the \texttt{xwiimote} library\cite{xwiimote} and translating them into a binary format. These updates are transmitted over UDP to a wiimote emulator that runs on the host Raspberry Pi.
+	      A custom Python script acts as an intermediary, capturing input events
+	      (such as accelerometer data, IR signals, and button presses) using the
+	      \texttt{xwiimote} library\cite{xwiimote} and translating them into a binary
+	      format. The script transmits these updates over UDP\cite{wikipediaUDP} to a Wiimote emulator running on the host machine.
 
 	\item \textbf{Wiimote Emulator:}
-	      The emulator, derived from a fork\cite{jr_wiimote_emu} of the \texttt{WiimoteEmulator} project\cite{wiimote_emulator}, has been extended to handle IR and accelerometer data, bridging the gap between physical inputs and the emulated control signals expected by the Wii. The emulator processes incoming UDP packets, updates its internal state, and generates the corresponding output signals.
+	      The emulator, derived from a fork\cite{jr_wiimote_emu} of the
+	      \texttt{WiimoteEmulator} project\cite{wiimote_emulator}, interprets the incoming
+	      UDP packets and simulates the corresponding Wii Remote inputs, which are then
+	      relayed to the Wii console via a Bluetooth connection. This project extends the
+	      emulator's functionality to include streaming IR and accelerometer data over
+	      UDP, which is essential for emulating the Wii Remote's motion controls based on
+	      the remote player's inputs.
 
 	\item \textbf{Audio and Video Streaming:}
-	      To recreate the authentic gaming experience, the system includes an audiovisual streaming component. Using the Real-time Transport Protocol (RTP), the video and audio outputs from the host are captured and transmitted to a client device. A significant design challenge was the trade-off between stream quality and latency, leading to a careful tuning of encoding parameters and RTP settings.
+	      An audiovisual streaming component enables remote gameplay by capturing
+	      video and audio outputs from the Wii console. The system transmits these streams
+	      to a client machine via the host machine using the Real-time Transport Protocol
+	      (RTP)\cite{wikipediaRTP}. A significant design challenge was the trade-off
+	      between stream quality and latency, leading to a careful tuning of encoding
+	      parameters and RTP settings.
 
 	\item \textbf{Automation and Deployment:}
-	      An automation script ensures that all system configurations—such as loading kernel modules and setting up environment variables—are applied consistently across devices. This not only simplifies the initial setup but also mitigates issues that might arise from manual configuration errors.
+	      An automation script applies system configurations  -- such as loading
+	      kernel modules and installation of dependencies  -- consistently across devices.
+	      This not only simplifies the initial setup but also mitigates issues that might
+	      arise from manual configuration errors.
 \end{itemize}
 
-\section{Component-Level Design and Data Flow}
+\section{Controller Input Relay}
 
-The system’s architecture emphasises clear data flow and modularity. Figure~\ref{fig:expanded_overview} illustrates the primary components and their interactions.
+\subsection{Design Rationale}
+The relay is a custom Python script, leveraging Python’s rapid development cababilities and its extensive library support. The integration with the \texttt{xwiimote} library was particularly attractive because it allowed for the efficient capture of diverse input events (e.g., accelerometer readings, IR signals, and button presses). This design decision provided a robust platform that could quickly adapts when new input modalities or requirements emerge.
 
-% \begin{figure}[h]
-% 	\centering
-% 	\includegraphics[width=0.9\textwidth]{advanced_intro.jpg}
-% 	\caption{System Architecture and Data Flow}
-% 	\label{fig:architecture}
-% \end{figure}
+\subsection{Communication Strategy}
+The relay utilises fixed-length binary packets that transmit over UDP to minimise communication latency and relay each sensor event in as close to real time as possible. The choice of UDP, despite its lack of error-checking compared to TCP\cite{wikipediaTCP}, was deliberate: it reduces overhead and is better suited for applications where timely data delivery is more critical than guaranteed packet delivery. All of the I/O operations in the relay are non-blocking, further enhancing responsiveness and ensuring that the system remains highly interactive.
 
-At the core of the design is the input relay mechanism, which operates as follows:
+\subsection{Modularity and Extensibility}
+Modularity was a guiding principle in the relay’s design. By mapping all input types to a unified binary format, the system remains adaptable. New sensors, like Wii MotionPlus\cite{wikipediaMotionPlus} or alternate controllers, like nunchucks, can integrate without significant changes to the core architecture. This design supports future enhancements while maintaining a clear separation between data acquisition, processing, and transmission.
 
-\begin{enumerate}
-	\item \textbf{Input Capture:}
-	      The Wii Remote’s events are captured using the \texttt{xwiimote} library. Both analog (accelerometer, IR) and digital (button press) events are monitored continuously.
+\section{Wiimote Emulator}
 
-	\item \textbf{Event Processing:}
-	      In the Python script, events are handled in a non-blocking manner using \texttt{select.poll()}. The script processes each event by normalising sensor data and mapping it into the expected range. For example, IR data is normalised to a [0,1] scale and then converted to a resolution that matches the Wii’s requirements, while accelerometer data is similarly scaled.
+\subsection{Leveraging Established Codebase}
+Instead of developing a Wii Remote emulator from scratch, the project builds upon the \texttt{WiimoteEmulator} project. Building a new Wii Remote emulator would have been too time-consuming and risked introducing bugs. One benefit of building an emulator from scratch would be the ability to minimise the latency between the emulator and the Wii console -- something that the \texttt{WiimoteEmulator} project didn't focus on. However, the latency introduced by the emulator doesn't make the games unplayable, as shown in the \nameref{sec:playability-analysis} section. Adapting an existing project allowed for a focus on design improvements rather than foundational re-implementation.
 
-	\item \textbf{Packet Formation and Transmission:}
-	      Processed events are packaged into binary data packets. The design utilises fixed-length packets with a dedicated header byte to distinguish between different types of events (e.g., \texttt{0x01} for IR and \texttt{0x02} for accelerometer data). These packets are transmitted over UDP to the emulator, which interprets them to simulate the corresponding inputs.
+\subsection{Enhanced Input Simulation}
+ Extensions to the emulator support streaming IR and accelerometer data over UDP. This feature enables the remote player’s inputs to be accurately reflected in the Wii console’s gameplay. The original \texttt{WiimoteEmulator} project is able to emulate IR and accelerometer data but only through a mouse and keyboard interface. In addition, the original project calculates all the IR and accelerometer data in small movements, i.e. there is no way to quickly snap from one end of the screen to the other. Thus, the design improvements of the \texttt{WiimoteEmulator} project centre around fixing these shortcomings.
 
-	\item \textbf{Emulation and Output:}
-	      The emulator on the host Raspberry Pi receives the UDP packets and integrates the data into its internal state. The emulation layer uses transformation routines to convert the incoming data into the simulated state of the Wii Remote, including generating IR positions and accelerometer readings.
-\end{enumerate}
+\section{Audio and Video Streaming}
+
+\subsection{Protocol Selection and Trade-offs}
+Adopting the Real-time Transport Protocol (RTP) leverages its robust framework for live media streaming. RTP’s design supports low-latency transmission, which is essential for synchronising audiovisual output with user inputs. The design process involved carefully weighing the trade-offs between achieving high media quality and minimising transmission delay, with a preference for a configuration that favours timely delivery over maximal resolution.
+
+\subsection{Use of FFmpeg and FFplay}
+The system relies on FFmpeg\cite{wikipediaFFmpeg} and FFplay\cite{ffplay} for capturing and streaming audiovisual data. FFmpeg’s extensive codec support and FFplay’s real-time playback capabilities make them well-suited for this application. The design leverages these tools to ensure seamless audiovisual streaming, with FFplay providing a low-latency display of the Wii’s output on the client machine. Notably, this requires remote users to use FFplay, or similar tools that integrate with FFmpeg, to view the game stream. This restricts users to a possibly unfamiliar interface, but ensures a consistent experience across all clients.
+
+\section{Automation and Deployment}
+
+\subsection{Centralised Configuration Management}
+A comprehensive setup script manages critical configuration task -- such as loading essential kernel modules, updating Bluetooth settings, and installing necessary libraries. Centralising these tasks into an automated process reduces the risk of inconsistencies and ensures that every deployment starts from a known baseline.
+
+\subsection{Accessibility and Usability}
+The automation script priorities user-friendliness and accessibility. By abstracting complex setup procedures into a single command, the script lowers the barrier to entry for users who may lack technical expertise. This design choice aligns with the project’s goal of providing an accessible and intuitive remote gaming experience meant for a broad audience.
+
+\subsection{Scalability and Future-Proofing}
+A key design decision was to ensure that the deployment process could scale with the system. The automation script is easy to extend and can incorporate new configuration steps when new features or requirements arise. This foresight in design allows the system to evolve without necessitating a complete overhaul of the deployment process, thereby supporting long-term scalability and maintainability.
+
+% \section{Component-Level Design and Data Flow}
+
+% The system’s architecture emphasises clear data flow and modularity. Figure~\ref{fig:expanded_overview} illustrates the primary components and their interactions.
+
+% % \begin{figure}[h]
+% % 	\centering
+% % 	\includegraphics[width=0.9\textwidth]{advanced_intro.jpg}
+% % 	\caption{System Architecture and Data Flow}
+% % 	\label{fig:architecture}
+% % \end{figure}
+
+% At the core of the design is the input relay mechanism, which operates as follows:
+
+% \begin{enumerate}
+% 	\item \textbf{Input Capture:}
+% 	      The Wii Remote’s events are captured using the \texttt{xwiimote} library. Both analog (accelerometer, IR) and digital (button press) events are monitored continuously.
+
+% 	\item \textbf{Event Processing:}
+% 	      In the Python script, events are handled in a non-blocking manner using \texttt{select.poll()}. The script processes each event by normalising sensor data and mapping it into the expected range. For example, IR data is normalised to a [0,1] scale and then converted to a resolution that matches the Wii’s requirements, while accelerometer data is similarly scaled.
+
+% 	\item \textbf{Packet Formation and Transmission:}
+% 	      Processed events are packaged into binary data packets. The design utilises fixed-length packets with a dedicated header byte to distinguish between different types of events (e.g., \texttt{0x01} for IR and \texttt{0x02} for accelerometer data). These packets are transmitted over UDP to the emulator, which interprets them to simulate the corresponding inputs.
+
+% 	\item \textbf{Emulation and Output:}
+% 	      The emulator on the host Raspberry Pi receives the UDP packets and integrates the data into its internal state. The emulation layer uses transformation routines to convert the incoming data into the simulated state of the Wii Remote, including generating IR positions and accelerometer readings.
+% \end{enumerate}
 
 \section{Unusual and Innovative Design Features}
 
-Several aspects of the system’s design stand out due to their innovative nature:
+\subsection{Responsive Motion Control Emulation}
+The system’s motion control emulation is a novel feature that enables remote players to interact with the game in real-time. By streaming IR and accelerometer data over UDP, the system accurately reflects the remote player’s inputs on the Wii console. Allowing a remote user to control the game as if they were physically present is a unique design feature that enhances the system’s immersive qualities.
 
-\subsection{End-to-End Multiplayer Revival}
-
-The system is designed to recreate the local multiplayer experience of the Nintendo Wii in an online setting. By combining audiovisual streaming with real-time input relay, the project aims to provide a seamless and authentic gaming experience that captures the essence of the original console. The project is easy to setup and use due to the automation scripts removing the need for advanced technical knowledge. This holistic approach to reviving the multiplayer capabilities of the Nintendo Wii is unique and distinguishes the project from other remote gaming solutions.
-
-
-%% \subsection{Binary Protocol for Real-Time Communication}
-
-%% Instead of relying on verbose text-based protocols, the system employs a custom binary protocol to transmit sensor and button events over UDP. This design decision minimises overhead and latency, which are critical for real-time input relay. By defining fixed packet structures and using network byte order for float values, the system achieves a high level of efficiency in both packing and unpacking data. Such low-level control over the communication protocol is uncommon in similar projects and represents a key innovation in the design.
-
-\subsection{Modular and Extensible Input Processing}
-
-The design of the input processing pipeline is highly modular. Different types of inputs (e.g., IR, accelerometer, button events) are handled in discrete sections of the code. This modularity allows for independent testing and future enhancements; for instance, additional sensor types or new control schemes can be incorporated with minimal changes to the overall architecture.
+\subsection{Local Play Game Features}
+Other third party projects, like \texttt{wiimmfi}\cite{wiimmfi}, have focused on replicating the functionality of the Wii’s original online services. However, many Nintendo Wii games have specific gameplay features that require local multiplayer or never supported online play -- such as Wii Sports. This project’s focus on enabling local multiplayer experiences over IP is a unique design feature that caters to a broader range of games and plugs a gap in the existing ecosystem.
 
 \subsection{Automated Environment Configuration}
-
-Another unusual aspect of the design is the automated device setup. Recognising the complexity involved in configuring kernel modules, Bluetooth settings, and environment variables across multiple devices, an automation script was developed. This script ensures that all prerequisites for running the system are met without manual intervention, significantly reducing setup time and potential human errors.
+Automates device setup by configuring kernel modules, adjusting Bluetooth configuration files, and installing necessary dependencies through a comprehensive script. This minimises configuration errors and drastically reduces setup time, ensuring that all devices operate from a consistent baseline. This design feature simplifies the deployment process, making the system accessible to users with varying technical expertise. The focus on accessibility and usability is novel in the context of remote gaming systems, where complex configurations can be a significant barrier to entry\cite{dirkBarrierToEntry}.
 
 %% \section{Design Trade-offs and Considerations}
 
