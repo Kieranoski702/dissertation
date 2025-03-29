@@ -14,11 +14,14 @@
   
 Questions for Tom:
 
+- Do you have the other half of the feedback
+- Can we do experiment
 - I say that wii sport original had no online play. I knwo this is true but I cant find a source proving the negative. How can I source this/do I need to
 - Is requirements table correct format?
 - Should reference to figure 1.2 in design section be a duplication of the figure insetad?
 - How can I do playability testing? I looked at the paper which talks about interaction lag which I might be able to measure but would be hard to get the latency between the wii performing the action and seeing the action over hdmi. Other than this what other playability testing can I do?
 - Do I need a testing summary? 
+- List of tables and list of figures?
 
 Things to do:
 - Too fluffy - too many weasel words
