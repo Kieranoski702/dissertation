@@ -1,117 +1,283 @@
 \chapter{Implementation}
 \label{chapter:implemntation}
 
-This chapter details the practical development and testing of the system. It focuses on the integration of various hardware and software components, the novel modifications made to existing projects, and the challenges encountered along the way. The discussion covers the connection setup between the Wii Remote and Raspberry Pi, the streaming of audiovisual data, the extension of Wii Remote emulation, and the creation of a Python-based input relay.
+This chapter details the practical development and testing of the system. It
+focuses on the integration of various hardware and software components, the
+novel modifications made to existing projects, and the challenges encountered
+along the way. The discussion covers the connection setup between the Wii Remote
+and Raspberry Pi, the streaming of audiovisual data, the extension of Wii Remote
+emulation, and the creation of a Python-based input relay.
 
 \section{Establishing Wii Remote Connectivity}
+\subsection{Linux Driver Configuration}
 
-One of the initial challenges was to reliably connect the Wii Remote to the Raspberry Pis. This was achieved by enabling the Linux driver for the Wii Remote using:
+One of the initial challenges was to reliably connect the Wii Remote to the
+Raspberry Pis. The first step to allow a Wiimote to connect to a Linux machine
+is enabling the Linux driver for Wiimotes using the following command:
 
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}[language=bash, emph={modprobe}, emphstyle={\color{magenta}}]
 modprobe hid-wiimote
 \end{lstlisting}
 
-To ensure that this driver is loaded automatically at boot, the following command was run to add the wiimote drivers to the modules-load configuration:
+Running the following command ensures that this driver loads automatically at boot:
 
 \begin{lstlisting}[language=bash]
 echo hid-wiimote | sudo tee /etc/modules-load.d/wiimote.conf
 \end{lstlisting}
 
-This step was crucial for providing a persistent connection between the Wii Remote and the Raspberry Pi environment.
+The automated device setup script incorporates this step to ensure that the driver is always loaded correctly.
+
+\subsection{Bluetooth Pairing and Connection}
+
+The next step is to pair the Wii Remote with the Raspberry Pi via Bluetooth. As
+Bluetooth requires authorisation to connect two wireless peers, simply loading
+the kernel driver is not enough. The Wiimote needs to associate with the Wiimote
+with the client machine by trusting it and then establish a connection.
+
+Using the \texttt{bluetoothctl}\cite{bluetoothctl} command-line tool, to pair the Wii Remote with the Raspberry Pi, follow these steps:
+
+\begin{enumerate}
+	\item Run \texttt{bluetoothctl} to enter the Bluetooth control interface.
+	\item Enter \texttt{scan on} to start scanning for Bluetooth devices.
+	\item Immediately press the \textbf{1} and \textbf{2} buttons simultaneously on the Wii Remote to put it in pairing mode.
+	\item In the list of discovered bluetooth devices, find the Wii Remote and note its MAC address.
+	\item Put the Wii Remote into pairing mode and enter \texttt{trust <Wii Remote MAC address>} to trust the Wii Remote.
+	\item Put the Wii Remote into pairing mode and enter \texttt{connect <Wii Remote MAC address>} to establish a connection.
+\end{enumerate}
+
+If the connection is successful, one of the indicator LEDs on the Wii Remote will remain lit. The Wii Remote is now connected to the Raspberry Pi and ready for use.
 
 \section{Selection of Wii Remote Libraries and Addressing Bluetooth Issues}
 
-After evaluating multiple libraries and tools for Wii Remote interfacing, the xwiimote\cite{xwiimote} library was chosen, particularly for its Python bindings\cite{xwiimote_bindings}, which allowed for seamless integration into a Python script. During testing, an issue arose where the Wii Remote connected via Bluetooth but exhibited continuously flashing lights, with xwiimote failing to register inputs. Luckily this is a known issue\cite{xwiimote_issue} and could be resolved by modifying the Bluetooth configuration file at \texttt{/etc/bluetooth/input.conf} and adding the following line:
+Evaluation of multiple libraries and tools for Wii Remote interfacing led to the selection of the xwiimote\cite{xwiimote} library,, particularly for its Python
+bindings\cite{xwiimote_bindings}, which allowed for seamless integration into a
+Python script. During testing, an issue arose where the Wii Remote connected via
+Bluetooth but exhibited continuously flashing lights, with xwiimote failing to
+register inputs. Luckily this is a known issue\cite{xwiimote_issue} -- modifying
+the Bluetooth configuration file at \texttt{/etc/bluetooth/input.conf} and
+adding the following line resolves this issue:
 
 \begin{lstlisting}[language=bash]
 ClassicBondedOnly=false
 \end{lstlisting}
 
-This adjustment enabled proper pairing and stable operation of the Wii Remote.
+This adjustment enabled proper pairing and stable operation of the Wii Remote. The setup script automates this configuration step to ensure consistent performance across devices.
 
 \section{Audio and Video Streaming Optimisation}
-Streaming audio and video from the host Raspberry Pi to the client Pi posed a significant challenge, with a trade-off observed between media quality and latency. Higher quality streams resulted in high latency, while lower quality streams compromised user experience. The solution was to adopt the Real-time Transport Protocol (RTP) with carefully tuned broadcast and playback settings. Although further optimisations remain possible, this configuration currently offers a balanced compromise between low latency and acceptable media quality.
+Streaming audio and video from the host Raspberry Pi to the client Pi posed a
+significant challenge, with a trade-off observed between media quality and
+latency. Higher quality streams resulted in high latency, while lower quality
+streams compromised user experience. The solution was to adopt the Real-time
+Transport Protocol (RTP) with carefully tuned broadcast and playback settings.
+Although further optimisations remain possible, this configuration currently
+offers a balanced compromise between low latency and acceptable media quality.
 
-%% TODO: Add the contents of the play-rtp.sh and broadcast-rtp.sh scripts here
+\subsection{\texttt{broadcast-rtp.sh} Script}
+
+The \texttt{broadcast-rtp.sh} script runs the following command:
+
+\begin{lstlisting}[language=bash]
+  ffmpeg -max_delay 0 -max_probe_packets 1 -f v412 -framerate 25 -video_size 720x576 -threads 1 -i /dev/video0 -vcodec libx264 -pix_fmt:v yuv420p -g:v 1 -preset ultrafast -tune zerolatency -crf 17 -max_delay 0 -fflags +nobuffer -flags low_delay -f rtp -muxdelay 0 rtp://192.168.20.20:42423
+\end{lstlisting}
+
+Table~\ref{tab:broadcast-args} explains the arguments used in the script in detail. See the official \texttt{ffmpeg} documentation for more information\cite{ffmpegDocumentation}.
+
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|p{5cm}|p{10cm}|}
+    \hline
+        Argument & Explanation \\ \hline
+        `-max\_delay 0` & Processes incoming packets immediately without waiting for additional data, reducing buffering delay. \\ \hline
+        `-max\_probe\_packets 1` & Limits probing to one packet to accelerate stream setup. \\ \hline
+        `-f v412` & Specifies the input format provided by the video capture device; ensures compatibility with the incoming video data. \\ \hline
+        `-framerate 25` & Sets the frame rate to 25 fps to balance smooth playback and processing load. \\ \hline
+        `-video\_size 720x576` & Defines the video resolution at 720x576 pixels. \\ \hline
+        `-threads 1` & Restricts encoding to a single thread for consistent low-latency performance. \\ \hline
+        `-i /dev/video0` & Specifies the video capture device as /dev/video0. \\ \hline
+        `-vcodec libx264` & Uses the H.264 encoder (libx264) for video encoding. \\ \hline
+        `-pix\_fmt:v yuv420p` & Enforces the yuv420p pixel format for wide compatibility with RTP receivers. \\ \hline
+        `-g:v 1` & Forces every frame to be a keyframe, which improves stream recovery and reduces latency. \\ \hline
+        `-preset ultrafast` & Minimises processing time by using the fastest encoding preset. \\ \hline
+        `-tune zerolatency` & Optimises the encoder for real-time transmission by reducing latency. \\ \hline
+        `-crf 17` & Sets the constant rate factor to balance quality and compression efficiency. \\ \hline
+        `-fflags +nobuffer` & Disables internal buffering in ffmpeg to minimise latency. \\ \hline
+        `-flags low\_delay` & Enables low-delay processing modes for reduced end-to-end latency. \\ \hline
+        `-f rtp` & Specifies the output format as RTP. \\ \hline
+        `-muxdelay 0` & Sets the multiplexing delay to zero, ensuring immediate packetisation of the stream. \\ \hline
+        `Output Destination: rtp://192.168.20.20:42423` & Designates the target IP address and port for the RTP stream transmission. \\ \hline
+    \end{tabular}
+\caption{\texttt{broadcast-rtp.sh} Argument Explanations}
+    \label{tab:broadcast-args}
+
+\end{table}
+
+
+
+\subsection{\texttt{play-rtp.sh} Script}
+
+The \texttt{broadcast-rtp.sh} script leverages \texttt{ffmpeg} to capture video from the connected camera device (\texttt{/dev/video0}), encode it in real time, and broadcast it over the Real-time Transport Protocol (RTP). This configuration is carefully tuned to minimise latency while still delivering acceptable video quality for interactive applications. The script runs the following command:
+
+\begin{lstlisting}[language=bash]
+  ffplay -vcodec h264 -max_delay 0 -analyzeduration 1 -protocol_whitelist file,udp,rtp -fflags nobuffer -strict experimental -framedrop -flags low_delay -probesize 32 -vf setpts=0 -sync ext rtp-h264.sdp
+ \end{lstlisting}
+
+Table~\ref{tab:play-args} explains the arguments used in the script in detail. See the official \texttt{ffplay} documentation for more information\cite{ffplayDocumentation}.
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|p{5cm}|p{10cm}|}
+    \hline
+        Argument & Explanation \\ \hline
+        `-vcodec h264` & Specifies that the incoming stream is encoded in H.264, ensuring the correct decoder is used. \\ \hline
+        `-max\_delay 0` & Eliminates buffering delays on the playback side, promoting real-time viewing. \\ \hline
+        `-analyzeduration 1` & Limits the analysis duration to speed up the startup process. \\ \hline
+        `-protocol\_whitelist file,udp,rtp` & Whitelists required protocols (file, UDP, RTP) for reading the SDP file and handling the RTP stream. \\ \hline
+        `-fflags nobuffer` & Disables input buffering to reduce latency during playback. \\ \hline
+        `-strict experimental` & Allows usage of experimental features if necessary for stream compatibility. \\ \hline
+        `-framedrop` & Drops frames if decoding lags, keeping playback as close to real-time as possible. \\ \hline
+        `-flags low\_delay` & Enforces low-delay processing to maintain alignment with the low-latency broadcast. \\ \hline
+        `-probesize 32` & Sets a minimal data probe size (32 bytes) to reduce initialisation time. \\ \hline
+        `-vf setpts=0` & Resets presentation timestamps to help maintain sync in a low-latency context. \\ \hline
+        `-sync ext` & Synchronises playback using an external clock for accurate timing with the RTP stream. \\ \hline
+        `Input File: rtp-h264.sdp` & Provides the SDP file that describes the RTP stream parameters, essential for interpreting the incoming data correctly. \\ \hline
+    \end{tabular}
+\caption{\texttt{play-rtp.sh} Argument Explanations}
+    \label{tab:play-args}
+
+\end{table}
+
+
+
+
+\section{Python Script for Input Relay}
+A core component of the project is the custom Python script
+(\texttt{wiimote\_to\_emulator.py}) that serves as a bridge between the physical
+Wii Remote and the emulation backend running on the host Raspberry Pi. This
+script leverages the \texttt{xwiimote} Python bindings to interface directly
+with the Wii Remote hardware, continuously monitoring for various input events
+and relaying them to the Wii Remote Emulator via UDP.
+
+\subsection{Wiimote Connection and Monitoring:}
+The script initialises a \texttt{xwiimote} monitor to detect when a Wii Remote connects to the client machine. When the input relay detects a device, it creates an interface with the device and opens it for both reading and writing. This method of setting up the Wii Remote connection differs from the traditional approach other libraries use, which typically use the device files located in the \texttt{\\dev} directory automatically without the need for manual setup.
+
+\subsection{Non-Blocking I/O and Event Polling:}
+Using the \texttt{select.poll()} mechanism, the script sets up non-blocking I/O on the Wii Remote’s file descriptor. This allows the script to efficiently wait for input events without stalling the main event loop. When the script detects events, the script calls \texttt{dev.dispatch(evt)} to process them.
+
+\subsection{Event Processing and Binary Packet Formation:}
+Depending on the event type, the script processes the data accordingly:
+
+\subsubsection{Accelerometer Events}
+When the machine receives an accelerometer event (identified by \texttt{xwiimote.EVENT\_ACCEL}), the script retrieves the raw accelerometer values from channel 0. It then normalises these values (using a custom scaling and offset transformation) and packs them into a binary packet with the header \texttt{0x02}. The binary format is:
+\begin{center}
+	\texttt{[1 byte event type (0x02)] + [4 bytes float ax] +}
+	\texttt{[4 bytes float ay] + [4 bytes float az]}
+\end{center}
+
+\subsubsection{IR Events:}
+For IR events (identified by \texttt{xwiimote.EVENT\_IR}), the script retrieves the IR coordinates and normalises them to a [0,1] range. It then packs the data into a binary packet with header \texttt{0x01}:
+\begin{center}
+	\texttt{[1 byte event type (0x01)] + [4 bytes float x] +}
+	\texttt{[4 bytes float y] + [4 bytes float z]}
+\end{center}
+
+\subsubsection{Button (Key) Events:}
+The script also processes key events (e.g., pressing the \texttt{+}, \texttt{-}, \texttt{HOME}, \texttt{A}, and \texttt{B} buttons). The input relay handles these by sending text-based command packets (e.g., \texttt{"button 1 WIIMOTE\_PLUS"}) over UDP to indicate button press and release actions.
+
+\subsection{UDP Communication:}
+The script creates a UDP socket to transmit the binary (and text-based) update packets to the Wii Remote Emulator. The user provides the IP address and port of the host machine running the Wii Remote emulator via command-line arguments. The script logs key actions and any errors using Python’s built-in logging facilities, ensuring that debugging information is available during operation.
+
+\subsection{Robust Error Handling:}
+The script catches and logs exceptions (such as I/O errors during event dispatching). This approach ensures that transient errors do not break the event loop, thereby maintaining reliable real-time transmission of control data while providing feedback to the user. The script also handles keyboard interrupts gracefully, ensuring that the Wii Remote connection is properly closed before exiting.
 
 \section{Wii Remote Emulation Enhancements}
 
-A core component of the project is the emulation of the Wii Remote on the host Raspberry Pi. This was implemented by adapting a modified version of the \texttt{WiimoteEmulator} originally developed by Ryan Conrad\cite{wiimote_emulator} (known as rnconrad on GitHub). \texttt{WiimoteEmulator} is able to emulate a bluetooth wii controller in software, allowing the wii to be controlled by many different input devices such as a keyboard, mouse, or text commands over a network.
+The system’s final major component is the emulation of the Wii Remote on the host
+Raspberry Pi. The implementation utilises a modified version of the
+\texttt{WiimoteEmulator} originally developed by Ryan
+Conrad\cite{wiimote_emulator} (known as rnconrad on GitHub).
+\texttt{WiimoteEmulator} is able to emulate a bluetooth wii controller in
+software, enabling control of the wii through various different input devices such
+as a keyboard, mouse, or text commands over a network.
 
-A fork of the project by JRogaishio\cite{jr_wiimote_emu} was selected as it fixes two critical bugs. The first
-bug is that the ip command in the original project was not working due to an index error. The second bug is that the original project was not compiling due to a call to \texttt{graceful\_disconnect()} which was not defined.
+More specifically, this project builds on a fork of the project by
+JRogaishio\cite{jr_wiimote_emu} as it fixes two critical bugs. The first bug is
+that the ip command in the original project was not working due to an index
+error. The second bug is that the original project was not compiling due to a
+call to \texttt{graceful\_disconnect()} which was not defined.
 
-The researcher's version\cite{kf_wiimote_emu} further extends this fork by adding support for transmitting IR and accelerometer data over the IP socket interface.
+The version built in this project\cite{kf_wiimote_emu} builds upon this fork by adding support for transmitting IR and accelerometer data through the IP socket interface.
 
 \subsection{Enhancements and Challenges}
 
 
 \subsubsection{IR Emulation}
 
-IR emulation in the system is responsible for generating the infrared (IR) sensor data that the Wii Remote expects when pointing at a sensor bar. The implementation leverages the functions defined in \texttt{motion.c}. First, the function \texttt{look\_at\_pointer} computes a transformation matrix based on normalized pointer coordinates (\texttt{pointer\_x} and \texttt{pointer\_y}). This matrix defines the orientation of the emulated Wii Remote relative to a virtual screen, where physical dimensions (e.g., screen width, sensor bar width) and viewing distance are factored in.
+IR emulation in the system is responsible for generating the infrared (IR)
+sensor data that the Wii Remote expects when pointing at a sensor bar. The
+implementation leverages the functions defined in \texttt{motion.c}. First, the
+function \texttt{look\_at\_pointer} computes a transformation matrix based on
+normalised pointer coordinates (\texttt{pointer\_x} and \texttt{pointer\_y}).
+This matrix defines the orientation of the emulated Wii Remote relative to a
+virtual screen, factoring in physical dimensions (e.g., screen width, sensor bar
+width) and viewing distance.
 
-Next, \texttt{set\_motion\_state} uses this transformation to compute two sensor points (\texttt{sensor\_pt0} and \texttt{sensor\_pt1}). These points are projected into a normalized coordinate system via a custom perspective projection matrix (generated by \texttt{make\_cam\_projection\_mat}). Once the homogeneous coordinates are normalized, the resulting positions are mapped to the resolution expected by the Wii Remote (typically a range of 0-1023 in x and 0-767 in y). The size of each IR object is also computed based on the depth component (\texttt{z}) of the projected points, simulating the apparent size changes of IR sources with distance. This process ensures that the emulated IR data closely mimics the signals generated by a physical sensor bar.
+Next, \texttt{set\_motion\_state} uses this transformation to compute two sensor
+points (\texttt{sensor\_pt0} and \texttt{sensor\_pt1}).  A custom perspective projection matrix \linebreak(\texttt{make\_cam\_projection\_mat}) projects these points into a normalised coordinate system. After normalising the homogeneous coordinate, the resulting positions map to
+the resolution expected by the Wii Remote (typically a range of 0-1023 in x and
+0-767 in y). The size of each IR object is also computed based on the depth
+component (\texttt{z}) of the projected points, simulating the apparent size
+changes of IR sources with distance. This process ensures that the emulated IR
+data closely mimics the signals generated by a physical sensor bar.
 
 \subsubsection{Accelerometer Emulation}
 
-%% This function isn't really used by my addition so maybe remove/reword this section
+Accurately emulating the Wii Remote accelerometer involves reading accelerometer data transmitted from the client machine over the network, processing this data, and effectively injecting it into the emulated Wii Remote state on the host machine. This component is critical for games that heavily rely on motion controls, such as racing and sports games, which interpret device orientation and motion through accelerometer inputs.
 
-Accelerometer emulation is handled primarily in the function \texttt{set\_accelerometer} in \texttt{motion.c}. The goal is to simulate the Wii Remote's accelerometer readings based on its orientation. A fixed gravity vector (set as \texttt{\{0, -1.0, 0\}}) represents the effect of gravity on the remote. This vector is then transformed by the inverse-transposed 3x3 submatrix extracted from the Wii Remote's orientation matrix (computed in \texttt{look\_at\_pointer}).
+The Wii Remote Emulator captures the binary accelerometer packets using a non-blocking UDP socket interface implemented in \texttt{input\_socket.c}. Upon receiving a packet, the emulator extracts the floating-point acceleration values using a network-to-host float conversion function \texttt{ntohf()}. Specifically, the following procedure occurs within the emulator's UDP socket polling loop:
 
-The transformed acceleration values are clamped to a plausible range (between -3.4 and 3.4) to prevent unrealistic sensor readings. Finally, these values are scaled and shifted using the constants \texttt{accelerometer\_zero} and \texttt{accelerometer\_unit} to match the raw data format that the Wii Remote firmware expects. Although the accelerometer emulation code in \texttt{set\_accelerometer} is currently commented out in some testing scenarios (with real input values handled in \texttt{input.c}), it provides a framework for generating synthetic accelerometer data based on the current pointer orientation. Fine-tuning of these calculations is ongoing, especially to ensure compatibility with specific game dynamics (e.g., the sensitivity required by Mario Kart).
+\begin{enumerate}
+	\item Check if the packet starts with the correct identifier byte (\texttt{0x02}) and has the correct packet size (13 bytes).
+	\item Extract the network-order binary floats representing accelerations along the three axes.
+	\item Convert these network-order floats to host-order floats using \texttt{ntohf()}.
+\end{enumerate}
+
+These extracted values are then assigned directly into the Wii Remote emulator’s state structure:
+
+\begin{lstlisting}[language=C]
+state->usr.accel_x = event.analog_motion_event.x;
+state->usr.accel_y = event.analog_motion_event.y;
+state->usr.accel_z = event.analog_motion_event.z;
+\end{lstlisting}
+
+The input relay normalises the raw accelerometer data before transmitting it to the emulator. Thus, the Wii Remote emulator can directly use these values to update the emulated Wii Remote’s accelerometer state.
 
 \subsubsection{Latency}
 
-Latency is a critical performance metric for both the audiovisual streaming and the emulation of controller inputs. Several design decisions were made to minimise latency across the system:
+Latency is a critical performance metric when determining the playability of video games. In general, the lower the latency, the more responsive the game feels to the player. As such, minimising latency across the system was a key focus during development. The system employs several strategies to reduce latency and improve responsiveness, including:
 
 \begin{itemize}
-	\item \textbf{Non-blocking I/O:} In the \texttt{input\_socket.c} file, UDP sockets are configured with the \texttt{SOCK\_NONBLOCK} flag to ensure that the system can continuously poll for new input events without stalling on network reads. This approach is essential for maintaining responsiveness.
+	\item \textbf{Non-blocking I/O:} In the \texttt{input\_socket.c} file, UDP
+	      sockets use the \texttt{SOCK\_NONBLOCK} flag to ensure that the
+	      system can continuously poll for new input events without stalling on network
+	      reads. This approach is essential for maintaining responsiveness.
 
-	\item \textbf{Optimised Data Pipelines:} The system uses lightweight binary protocols for both IR and accelerometer updates. By sending fixed-length packets (e.g., 13-byte packets for IR and accelerometer data), the overhead associated with parsing and error checking is reduced. These binary packets are handled in \texttt{input\_socket.c}, where functions such as \texttt{ntohf} convert network-order floats to host-order values with minimal delay.
+	\item \textbf{Optimised Data Pipelines:} The system uses lightweight binary
+	      protocols for both IR and accelerometer updates. Sending fixed-length packets
+	      (e.g., 13-byte packets for IR and accelerometer data) reduces the overhead associated
+	      with parsing and error checking, improving overall throughput.
 
-	      %% TODO: Add fix to altency issue here
+	\item \textbf{Increase Polling Frequency:} The original
+	      \texttt{WiimoteEmulator} project uses a 20ms polling interval for reading input
+	      events. By decreasing this value, thus increasing the polling frequency, the
+	      system can respond more rapidly to incoming data, reducing the overall latency
+	      of the system.
 
 \end{itemize}
 
-Despite these efforts, some latency issues remain due to the inherent latency present in the \texttt{WiimoteEmulator}. Further work on the \texttt{WiimoteEmulator} project is needed to address these challenges and improve the overall responsiveness of the system.
-
-\section{Python Script for Input Relay}
-The system’s final major component is a custom Python script (\texttt{wiimote\_to\_emulator.py}) that serves as a bridge between the physical Wii Remote and the emulation backend running on the host Raspberry Pi. This script leverages the \texttt{xwiimote} Python bindings to interface directly with the Wii Remote hardware, continuously monitoring for various input events and relaying them to the Wii Remote Emulator via UDP.
-
-Key features and design details include:
-
-\subsection{Wiimote Connection and Monitoring:}
-The script initialises a \texttt{xwiimote} monitor to detect when a Wii Remote is connected. Once a device is found, it creates an interface with the device and opens it for both reading and writing. This setup is essential to capture both analog events (e.g., accelerometer and IR data) and digital button presses.
-
-\subsection{Non-Blocking I/O and Event Polling:}
-Using the \texttt{select.poll()} mechanism, the script sets up non-blocking I/O on the Wii Remote’s file descriptor. This allows the script to efficiently wait for input events without stalling the main event loop. When events are detected, the script calls \texttt{dev.dispatch(evt)} to process them.
-
-\subsection{Event Processing and Binary Packet Formation:}
-Depending on the event type, the script processes the data accordingly:
-\subsubsection{Accelerometer Events}
-When an accelerometer event is received (identified by \texttt{xwiimote.EVENT\_ACCEL}), the script retrieves the raw accelerometer values from channel 0. It then normalizes these values (using a custom scaling and offset transformation) and packs them into a binary packet with the header \texttt{0x02}. The binary format is:
-\begin{center}
-	\texttt{[1 byte event type (0x02)] + [4 bytes float ax] +}
-	\texttt{[4 bytes float ay] + [4 bytes float az]}
-\end{center}
-\subsubsection{IR Events:}
-For IR events (identified by \texttt{xwiimote.EVENT\_IR}), the script retrieves the IR coordinates and normalizes them to a [0,1] range. It then packs the data into a binary packet with header \texttt{0x01}:
-\begin{center}
-	\texttt{[1 byte event type (0x01)] + [4 bytes float x] +}
-	\texttt{[4 bytes float y] + [4 bytes float z]}
-\end{center}
-\subsubsection{Button (Key) Events:}
-The script also processes key events (e.g., pressing the \texttt{+}, \texttt{-}, \texttt{HOME}, \texttt{A}, and \texttt{B} buttons). These are handled by sending text-based command packets (e.g., \texttt{"button 1 WIIMOTE\_PLUS"}) over UDP to indicate button press and release actions.
-
-\subsection{UDP Communication:}
-A UDP socket is created to transmit the binary (and text-based) update packets to the Wii Remote Emulator. The target emulator’s IP address and port are provided via command-line arguments. The script logs key actions and any errors using Python’s built-in logging facilities, ensuring that debugging information is available during operation.
-
-\subsection{Robust Error Handling:}
-Throughout the script, exceptions (such as I/O errors during event dispatching) are caught and logged. This approach ensures that transient errors do not break the event loop, thereby maintaining reliable real-time transmission of control data.
+Despite these efforts, some latency issues remain due to the inherent latency present in the \texttt{WiimoteEmulator}. Further work on the \texttt{WiimoteEmulator} project should aim to address these challenges and improve the overall responsiveness of the system.
 
 \section{Automation of Device Setup}
 
-To streamline the deployment process, a device setup script (\texttt{setup.sh}) was developed. This script requires administrative privileges (sudo) and automates several critical configuration tasks, including:
+To streamline the deployment process, the project includes a device setup script (\texttt{setup.sh}). This script requires administrative privileges (sudo) and automates several critical configuration tasks, including:
 
 \begin{itemize}
 
