@@ -1,10 +1,27 @@
 \chapter*{Abstract}
 
-The Nintendo Wii is well-known for its innovative, motion-based controls and engaging, family-friendly games such as Mario Kart Wii. Despite its hardware limitations compared to modern consoles, its local multiplayer experiences have cultivated a devoted following. However, with the rapid shift toward online gaming, recreating the Wii’s in-person, split-screen experiences has become increasingly challenging. This project proposes a solution that vitalises the Wii’s input and output interfaces, enabling remote players to enjoy an experience that mirrors local multiplayer gaming.
+This dissertation presents a novel system designed to enable remote multiplayer
+gameplay on the Nintendo Wii console while preserving the original local
+multiplayer experience. Local multiplayer gaming has historically provided
+unique communal experiences, but as online gaming has become dominant, these
+traditional modes have diminished, leaving a significant portion of the Wii’s
+legacy inaccessible. This work introduces a solution that enables remote players
+to participate in Wii games originally designed for local play.
 
-The approach centres on a three key components. First, video and audio streaming techniques capture the Wii’s outputs and deliver them to remote devices using low-latency protocols. Second, a novel controller input relay system transmits Wii Remote signals, including motion and button inputs, over a network. Third, a Wii Remote emulator interprets the remote player’s inputs and forwards them to the Wii console.
+The system integrates three core components. A capture and streaming subsystem
+is responsible for real-time extraction and transmission of the Wii’s video and
+audio outputs. A controller input relay converts Wii Remote signals into
+fixed-length binary packets and transmits them over a low-latency network
+connection. Finally, a Wii Remote emulator running on the host device interprets
+the relayed inputs and communicates with the console via Bluetooth. This
+configuration strives to preserve the original responsiveness and interactive
+quality of the Wii experience, while addressing challenges such as transmission
+delay and input accuracy.
 
-By combining these components, the project enables remote players to participate in local multiplayer games on the Wii. Furthermore, it establishes a framework for adapting retro systems to contemporary, distributed gaming environments. The work not only preserves the social and communal essence of local play but also offers broader implications for making nostalgic gaming experiences accessible to players across geographically separated locations.
+The project addresses key technical obstacles including latency minimisation,
+accurate input replication, and audiovisual quality maintenance. Rigorous
+testing and iterative design confirm that remote gameplay can closely
+approximate native local multiplayer interactions, despite residual challenges.
 
 \begin{center}
 	\noindent\rule{8cm}{0.4pt}
