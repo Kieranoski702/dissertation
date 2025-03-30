@@ -1,24 +1,53 @@
 \chapter{Conclusion}
 \label{chapter:conclusion}
 
-This dissertation has presented a comprehensive approach to adapting a classic local multiplayer experience for the modern era by bridging the gap between the Nintendo Wii’s original design and contemporary online gaming environments. The project’s core achievement lies in the development of a system that revitalises the Wii’s input and output interfaces -- capturing audio and video with low latency, and relaying controller inputs over a network in real time.
+This dissertation set out to explore the feasibility of remote multiplayer
+gameplay on the Nintendo Wii console while retaining local multiplayer dynamics.
+Through the development of a comprehensive system that integrates audiovisual
+streaming, low-latency input relay, and Wii Remote emulation, the project has
+successfully demonstrated the feasibility of remote gameplay that closely mimics
+the native local multiplayer experience.
 
-Key achievements of the project include:
-\begin{itemize}
-	\item The successful enhancement of the \texttt{WiimoteEmulator} project to support IR and accelerometer data, enabling the accurate emulation of Wii Remote inputs in a networked environment.
-	\item The implementation of a novel controller input relay system that processes and transmits IR, accelerometer, and button data using a low latency binary protocol.
-	\item The deployment of RTP-based audiovisual streaming techniques that balance media quality with the essential requirement of low latency, thereby preserving the authenticity of the Wii gaming experience.
-	\item The development of automation scripts that streamline the setup process, reducing the potential for manual errors and ensuring a reproducible environment across multiple devices.
-\end{itemize}
+The project’s most significant achievement lies in its successful integration of
+multiple complex components into a cohesive system. The implementation of a
+custom input relay, in tandem with a modified Wii Remote emulator, allowed for
+real-time transmission of controller inputs. This solution ensured that remote
+players could experience accurate and responsive control, even though some
+latency remained compared to native gameplay. Simultaneously, the audiovisual
+streaming subsystem managed to balance the trade-offs between media quality and
+latency, providing an immersive, real-time gaming experience. Overall, the
+system has demonstrated that with careful design and tuning, it is possible to
+deliver remote gameplay that respects the original Wii experience.
 
-Despite these successes, the project also encountered significant challenges and limitations. Notably, some latency issues remain, the project has not been thoroughly tested with more than 1 remote player, and other traditional Wii input devices such as nunchucks are not supported . Additionally, tuning the accelerometer to cater to different game-specific requirements, such as those observed in titles like Mario Kart, continues to present challenges. These drawbacks highlight areas where further research and development are necessary.
+Despite these successes, the project also encountered significant challenges and
+limitations. One key drawback was the persistent latency observed throughout the
+system. Although non-blocking I/O and aggressive buffering strategies reduced
+delays, the cumulative effect of video capture, encoding, network transmission,
+and emulation meant that some degree of lag remained -- particularly noticeable
+in fast-paced gaming scenarios. Additionally, limited peripheral support
+constrains the current implementation; the focus on the Wii Remote excludes
+important accessories like the nunchuck, thereby narrowing the scope of
+supported games. Manual accelerometer calibration also posed a challenge, as the
+fixed parameters did not adapt dynamically to different game requirements or
+user preferences.
 
-Looking to the future, several directions could further enhance the system:
-\begin{itemize}
-	\item \textbf{Optimisation of Latency:} Future work could focus on further reducing latency through further enhancements to the \texttt{WiimoteEmulator}, improved network protocols, or more efficient data processing.
-	\item \textbf{Enhanced Accelerometer Calibration:} Refining the mathematical models and calibration procedures for accelerometer data may improve the accuracy and responsiveness of motion controls thus resulting in a more pleasant gaming experience.
-	\item \textbf{Broader Platform Support:} Expanding the framework to support additional retro consoles or other legacy input devices could broaden the system’s applicability and impact.
-	\item \textbf{User Interface Improvements:} Enhancing the interface for setup and control, possibly through graphical tools or integrated diagnostics, would further improve usability and adoption.
-\end{itemize}
+Looking ahead, several promising avenues exist for further refining and
+expanding the system. Enhancing peripheral integration is a clear priority; by
+incorporating additional input devices such as the nunchuck and other motion
+sensors, the system could offer a more comprehensive emulation of the Wii’s
+original capabilities. Furthermore, scalability testing and further optimisation
+are essential for accommodating multiple simultaneous connections without
+sacrificing performance. Future work might also explore adaptive, dynamic
+calibration techniques -- potentially leveraging machine learning -- to
+automatically fine-tune accelerometer inputs based on real-time gameplay data.
+Such advancements could narrow the performance gap between emulated and native
+experiences, ultimately delivering a more authentic and responsive gaming
+environment.
 
-In summary, this project demonstrates a viable method for adapting a legacy gaming system to modern, distributed gaming environments while preserving the original charm and social dynamics of local multiplayer play. The work not only provides a framework for further experimentation and improvement but also contributes to the ongoing dialogue about preserving and revitalising classic gaming experiences in the digital age.
+In conclusion, this dissertation has successfully explored the transformation of
+a nostalgic gaming console into a modern, remote multiplayer platform.  While
+certain technical challenges and limitations remain, the achievements outlined
+herein demonstrate the potential for further innovation in this space. The
+insights gained from this work not only provide a foundation for future
+innovations in remote gaming technology but also reaffirm the enduring appeal of
+the classic Nintendo Wii experience.
