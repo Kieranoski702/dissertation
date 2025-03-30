@@ -24,6 +24,7 @@ Questions for Tom:
 - List of tables and list of figures?
 
 Things to do:
+- Do network analysis when artifical high ping?
 - Too fluffy - too many weasel words
 - Build on the figure over time
 - More detail

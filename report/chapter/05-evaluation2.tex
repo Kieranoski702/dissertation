@@ -1,7 +1,7 @@
 \chapter{Evaluation}
 \label{chapter:evaluation}
 
-This chapter evaluates the system with respect to the original objectives, and it critically compares the projects approach to related work in the field. The chapter also discusses the limitations of the system and suggests areas for future work.
+This chapter evaluates the system with respect to the original objectives, and it critically compares the projects approach to related work in the field. Specifically, it assesses the system's playability, identifies challenges encountered during development, and outlines solutions to these issues. The chapter also discusses the limitations of the system and suggests areas for future work.
 
 \section{Playlability Analysis}
 \label{sec:playability-analysis}
@@ -24,10 +24,8 @@ This chapter evaluates the system with respect to the original objectives, and i
 
 \section{Challenges and Solutions}
 
-During development, several significant challenges emerged, each addressed with innovative solutions.
-
-\subsubsection{Input Relay and Data Synchronisation}
-Integrating the \texttt{xwiimote} library with the modified \texttt{WiimoteEmulator} fork presented challenges in synchronising accelerometer and IR data. Custom matrix transformations in \texttt{motion.c} and hand-tuned calibration routines ensured that the emulated signals closely replicated the physical Wii Remote behaviour. Additionally, the adoption of a binary protocol for transmitting sensor data reduced overhead and improved overall system responsiveness.
+% \subsubsection{Input Relay and Data Synchronisation}
+% Integrating the \texttt{xwiimote} library with the modified \texttt{WiimoteEmulator} fork presented challenges in synchronising accelerometer and IR data. Custom matrix transformations in \texttt{motion.c} and hand-tuned calibration routines ensured that the emulated signals closely replicated the physical Wii Remote behaviour. Additionally, the adoption of a binary protocol for transmitting sensor data reduced overhead and improved overall system responsiveness.
 
 \subsubsection{IR Sensor Emulation}
 At first, the IR emulation only mapped to the bottom half of the screen due to a scaling value error.
@@ -45,10 +43,70 @@ vec3 pointer_world = {(pointer_x - 0.5) * screen_width, (pointer_y)*screen_width
 By correcting this error, the IR sensor data was correctly positioned on the screen, allowing for accurate pointing and cursor control. This fix was crucial for maintaining the playability of IR-dependent games.
 
 \subsubsection{Audiovisual Streaming}
-Balancing high-quality streaming with low latency was addressed by careful tuning of RTP parameters. Iterative testing of the \texttt{broadcast-rtp.sh} and \texttt{play-rtp.sh} scripts resulted in a workable compromise between video quality and responsiveness.
 
-\subsubsection{Latency Reduction}
-While the system successfully relayed input data and streamed audiovisual content, latency remained a persistent challenge. The use of RTP for streaming and a custom binary protocol for input relay helped minimise delays, but further optimisation is needed to bring the system closer to native play responsiveness.
+The audiovisual streaming component is a critical element in delivering an
+engaging remote gameplay experience. The system utilises the Real-time Transport
+Protocol (RTP) as its backbone for transmitting both video and audio streams.
+RTP is well suited to handling real-time data over IP networks,
+where timely delivery is as important as data integrity.
+
+To minimise delay while preserving media quality, the streaming pipeline relies
+on the open-source \texttt{ffmpeg} framework. The broadcasting script
+(\texttt{broadcast-rtp.sh}) is finely tuned with parameters that target a
+reduction in buffering and processing overhead. For example, flags such as
+\texttt{-max\_delay 0} and \texttt{-fflags +nobuffer} ensure immediate
+processing of incoming packets without accumulating extra data. Similarly, the
+\texttt{-preset ultrafast} and \texttt{-tune zerolatency} options accelerate
+encoding, even if this occasionally comes at the expense of compression
+efficiency.
+
+On the client side, the playback script (\texttt{play-rtp.sh}) mirrors these
+optimisations by disabling internal buffering (\texttt{-fflags nobuffer}) and
+enabling low-delay decoding strategies (\texttt{-flags low\_delay} and
+\texttt{-framedrop}). The inclusion of a dedicated SDP file further aids in
+accurately interpreting the stream parameters, reducing the initial
+synchronisation overhead.
+
+The combined effect of these settings is a streaming setup that strikes a
+balance between media fidelity and transmission speed. Although higher quality
+settings tend to increase processing delays, the current configuration offers a
+compromise that preserves the authenticity of the Wii experience in remote
+environments. % Iterative testing under varied network conditions has demonstrated
+% that, while occasional buffering delays may occur, the system generally
+% maintains acceptable audiovisual quality without compromising the interactive
+% aspect of gameplay.
+
+\subsubsection{Latency}
+
+Latency is a central performance metric in this project, as it directly impacts
+both the responsiveness of audiovisual feedback and the accuracy of input relays
+during gameplay. The overall system latency encompasses several stages: video
+capture, encoding, network transmission, decoding, and input processing. Each of
+these stages has been the focus of targeted optimisation efforts.
+
+On the streaming side, the low latency results from a combination of
+high-speed encoding and aggressive buffering control. The use of \texttt{ffmpeg}
+with options like \texttt{-g:v 1} (forcing every frame as a keyframe) helps in
+rapid recovery and minimises delays during packet loss or re-synchronisation
+events. The broadcasting pipeline’s non-buffered approach, as enforced by the
+\texttt{-max\_delay 0} and \texttt{-fflags +nobuffer} flags, keeps the
+end-to-end delay to a minimum, although this makes the system more
+sensitive to network jitter.
+
+The input relay component, responsible for transmitting controller data from the
+Wii Remote to the emulator, further mitigates latency by employing non-blocking
+I/O and a lightweight binary protocol. By packaging sensor data (IR and
+accelerometer values) into fixed-length packets and transmitting them over UDP,
+the system avoids the overhead associated with more complex data formats.
+Additionally, reducing the polling interval in the \texttt{WiimoteEmulator} from
+the original 20 ms to a shorter duration allows the system to react more swiftly
+to user inputs.
+
+Despite these efforts, some latency remains when compared to native Wii
+gameplay. The inherent delay introduced by network transmission and the
+processing limitations of the emulation environment contribute to a noticeable,
+albeit reduced, lag. For fast-paced or highly reactive gaming scenarios, even
+these minimised delays could affect user performance.
 
 \section{Limitations}
 
@@ -58,7 +116,7 @@ Despite meeting the primary project objectives, several limitations remain:
 	\item \textbf{Peripheral Support:}
 	      The current implementation does not support nunchuck input, thereby limiting the scope of the emulated Wii experience.
 	\item \textbf{Scalability:}
-	      The system has been tested with only a single remote player. Additional testing is needed to verify its performance in multi-user scenarios.
+	      The system underwent testing with only a single remote player. The projects needs additional testing to verify its performance in multi-user scenarios.
 	\item \textbf{Latency:}
 	      Although the system successfully transmits inputs and streams audiovisual data, the emulator exhibits a noticeable latency compared to native Wii play. This latency could impact the experience in highly responsive, fast-paced games.
 	\item \textbf{Accelerometer Calibration:}
@@ -67,22 +125,70 @@ Despite meeting the primary project objectives, several limitations remain:
 
 \section{Reflection and Future Work}
 
+% \subsection{Evaluation of Objectives}
+% As stated in the \hyperlink{chapter:introduction}{Introduction} chapter, the key objectives of the project were:
+
+% \begin{enumerate}
+% 	\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
+% 	\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
+% 	\item Evaluate the system’s performance and user experience in a real-world setting.
+% \end{enumerate}
+
+% Reflecting on the project in respect to these objectives, it is clear that the project successfully fulfils all three objectives. The system developed is capable of capturing and streaming the Wii’s video and audio output to remote players, relaying the Wii Remote’s controller data over a low-latency network connection, and has been evaluated in a real-world setting. The \nameref{sec:playability-analysis} section demonstrates that the system is capable of providing a playable experience for users, despite some limitations.
+%
 \subsection{Evaluation of Objectives}
-As stated in the \hyperlink{chapter:introduction}{Introduction} chapter, the key objectives of the project were:
+Reflecting on the project’s primary goals, it is evident that the system has successfully addressed the key challenges outlined in the \hyperlink{chapter:introduction}{Introduction}.
 
-\begin{enumerate}
-	\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
-	\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
-	\item Evaluate the system’s performance and user experience in a real-world setting.
-\end{enumerate}
+\subsubsection{Objective 1: Capturing and Streaming the Wii's Video and Audio Output}
+This objective focuses on the development and integration of automated scripts
+specifically designed to capture and stream the Wii's audiovisual data. The
+broadcasting script (\texttt{broadcast-rtp.sh}) plays a crucial role by
+leveraging the Real-time Transport Protocol (RTP) in conjunction with
+\texttt{ffmpeg} to encode and transmit video and audio data with minimal
+buffering. The script's carefully tuned parameters—including non-buffered input,
+forced keyframes, and low-latency encoding settings—ensure that the streaming
+pipeline efficiently manages the trade-off between media quality and
+transmission delay. On the client side, the playback script
+(\texttt{play-rtp.sh}) mirrors these optimisations to maintain synchronisation
+and reduce decoding overhead. Together, these scripts automate the processes
+required for capturing the Wii’s output, ensuring that remote players receive a
+real-time and immersive multimedia experience.
 
-Reflecting on the project in respect to these objectives, it is clear that the project successfully fulfils all three objectives. The system developed is capable of capturing and streaming the Wii’s video and audio output to remote players, relaying the Wii Remote’s controller data over a low-latency network connection, and has been evaluated in a real-world setting. The system has been tested in a controlled environment, and the evaluation has shown that the system is capable of providing a playable experience, despite some limitations.
+\subsubsection{Objective 2: Relaying the Wii Remote's Controller Data over a Low-Latency Network Connection}
+The second objective centres on the relay of controller data from the Wii Remote
+to the Wiimote emulator. First, a custom Python-based input relay system, built
+using the xwiimote Python bindings, captures real-time input events—including
+button presses, accelerometer data, and IR signals—and translates them into
+fixed-length binary packets. By adopting a lightweight binary protocol over UDP,
+the input relay minimises overhead, thereby ensuring low-latency transmission.
+In addition, enhancements made to the Wiimote Emulator enable it to accurately
+interpret these packets, thereby seamlessly integrating the physical controller
+inputs into the virtual environment. The combined approach of precise input
+relay and robust Wii Remote emulation confirms that the system meets the
+objective of providing responsive and accurate control for remote gameplay.
+
+\subsubsection{Objective 3: Evaluating System Performance and User Experience}
+The final objective involves a comprehensive playability analysis measuring
+system performance under realistic conditions. This analysis quantifies latency
+across different system stages, with detailed measurements assessing network
+latency during data transmission, the overhead introduced by the emulation
+process, and the interaction lag\cite{volkerseekerBestPaper} -- that is, the delay between a user’s input
+and the corresponding on-screen response. The findings indicate that while the
+latency is within a playable range, a measurable interaction lag remains. This
+evaluation not only validates the system's capability to deliver a playable
+gaming experience but also highlights specific areas where further optimisation
+can bring the performance closer to that of native Wii gameplay.
+
 
 \subsection{Comparison with Related Work}
-When comparing this project with related work in the public domain, several points emerge:
 
 \subsubsection{WiimoteEmulator and Its Derivatives}
-The original \texttt{WiimoteEmulator} project by rnconrad and subsequent forks (e.g., JRogaishio's version) primarily focused on emulating the Wii Remote for local control using Bluetooth. In contrast, this work extends these foundations by implementing network-based control. By integrating a custom binary protocol for IR and accelerometer data over IP sockets, this system adapts the concept of Wii Remote emulation to enable remote gameplay -- a feature not present in the original projects.
+The original \texttt{WiimoteEmulator} project by rnconrad and subsequent forks
+(e.g., JRogaishio's version) primarily focused on emulating the Wii Remote for
+local control using Bluetooth. In contrast, this work extends these foundations
+by implementing IR and accelerometer emulation over IP sockets. This system adapts the concept of
+Wii Remote emulation to enable remote gameplay -- a feature not present in the
+original projects.
 
 \subsubsection{Input Relay Techniques}
 While several research efforts and projects have addressed low-latency input relay for gaming peripherals, many rely on text-based communication protocols or lack the integration of real-time sensor data. This approach, which utilises a binary protocol to transmit fixed-length packets, reduces overhead and improves performance, thereby offering a competitive edge in scenarios requiring rapid response times.
@@ -91,11 +197,10 @@ While several research efforts and projects have addressed low-latency input rel
 In the broader context of remote gaming, solutions such as cloud gaming platforms have tackled the challenge of low-latency audiovisual streaming. However, these platforms often require substantial infrastructure and proprietary solutions. This system, by leveraging RTP for streaming and integrating it with the custom input relay, creates a unified framework that bridges both input and output channels in a manner that is both accessible and reproducible using open-source tools.
 
 \subsubsection{Overall System Integration}
-Compared to other projects that may focus solely on either streaming or input emulation, this work represents a holistic solution that aims to preserve the full multiplayer gaming experience. The integration of automated configuration, error handling, and modular software components differentiates this system, offering both flexibility and robustness. While certain aspects (e.g., latency and peripheral support) still need refinement, the combined approach sets a new benchmark for retro gaming adaptation in distributed environments.
-
+Compared to other projects that may focus solely on either streaming or input emulation, this work represents a holistic solution that aims to preserve the full multiplayer gaming experience. The integration of automated configuration, error handling, and modular software components differentiates this system, offering both flexibility and robustness.
 
 \subsection{Future Work}
-However, there are clear avenues for future improvement. The following areas could be explored in future iterations:
+However, there are clear avenues for future improvement. Future iterations could explore the following areas:
 
 \subsubsection{Enhanced Peripheral Integration}
 Future iterations could include support for additional Wii peripherals, such as the nunchuck, to provide a more comprehensive emulation of the original gaming experience. This would require extending the existing input relay system to accommodate the unique features of each peripheral.
