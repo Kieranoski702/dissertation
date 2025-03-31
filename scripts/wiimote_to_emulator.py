@@ -269,7 +269,6 @@ def main():
 
     except KeyboardInterrupt:
         logger.info("Exiting...")
-        break
     except Exception as e:
         logger.error("Error in main loop: {}".format(e))
         time.sleep(0.1)
