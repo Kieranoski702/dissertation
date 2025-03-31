@@ -1,0 +1,117 @@
+\chapter{User Manual}
+\label{appendix:user-manual}
+
+Before proceeding with any operations, ensure that you have run the \texttt{setup.sh} script. This script installs and compiles all necessary dependencies, so there is no need to build or compile components manually.
+
+\section{Determining Bluetooth Addresses}
+
+\subsection{Determining the Wii Remote Address}
+\label{subsection:wii-remote-address}
+
+\begin{enumerate}
+	\item Use the command:
+	      \begin{verbatim}
+hcitool scan
+    \end{verbatim}
+	      to search for discoverable devices.
+	\item Press the red sync button (located under the battery cover) on the Wii remote.
+	\item The Wii remote should appear (usually listed as \texttt{Nintendo RVL-CNT-01}) with its corresponding MAC address.
+\end{enumerate}
+
+\subsection{Determining the Wii Console Address}
+\label{subsection:wii-console-address}
+
+If the Wii remote emulator is operational, simply press the console's sync button. The emulator will automatically connect and display the Wii console's address.
+
+\section{Wii Remote Connection to Client Machine}
+
+To connect a Wii remote to the client machine, follow these steps:
+
+\begin{enumerate}
+	\item \textbf{Identify the Wii Remote's MAC Address:}
+	      Follow the steps outlined in Section \ref{subsection:wii-remote-address} to determine the Wii remote's MAC address.
+
+	\item \textbf{Establish a Connection:}
+	      \begin{enumerate}
+		      \item Open a terminal and launch \texttt{bluetoothctl}.
+		      \item Enable scanning by typing
+		            \begin{verbatim}
+scan on
+\end{verbatim}
+		      \item Type the command
+		            \begin{verbatim}
+trust [address]
+        \end{verbatim}
+		            while pressing the 1 and 2 buttons on the Wii remote which will put the Wii Remote into sync mode.
+		      \item Next, type
+		            \begin{verbatim}
+connect [address]
+        \end{verbatim}
+		            ensuring that the Wii Remote is still in sync mode by pressing the 1 and 2 buttons.
+	      \end{enumerate}
+\end{enumerate}
+
+% For further details, please refer to the online guide available at \url{https://blog.malware.re/2023/07/04/Wiimote-on-Linux-with-dev-input/index.html}.
+
+\section{Running the Wii Remote Emulator and Input Relay}
+
+To emulate Wii remote functionality, perform the following steps from within the \texttt{WiimoteEmulator} directory:
+
+\begin{enumerate}
+	\item \textbf{Disable and Stop the Bluetooth Service:}
+	      \begin{verbatim}
+sudo systemctl disable bluetooth
+sudo systemctl stop bluetooth
+sudo systemctl status bluetooth
+    \end{verbatim}
+
+	\item \textbf{Start the Custom Bluetooth Daemon Manually:}
+	      \begin{verbatim}
+sudo ./bluez-4.101/dist/sbin/bluetoothd
+    \end{verbatim}
+
+	\item \textbf{Launch the Emulator:}
+	      Run the emulator with the Wii Console's MAC address (as determined in Section \ref{subsection:wii-console-address})
+	      and specify the IP address and port:
+	      \begin{verbatim}
+sudo ./wmemulator [MAC Address] [IP Address] [Port]
+    \end{verbatim}
+
+	\item \textbf{Start the Python Input Relay on client machine:}
+	      On another machine, run the input relay script:
+	      \begin{verbatim}
+./wiimote_to_emulator.py --host [IP Address] --port [Port]
+\end{verbatim}
+
+
+	\item \textbf{Restoring Bluetooth Services:}
+	      Once finished, execute the following on the host machine:
+	      \begin{verbatim}
+sudo killall bluetoothd
+sudo systemctl enable bluetooth
+sudo systemctl start bluetooth
+sudo systemctl status bluetooth
+    \end{verbatim}
+\end{enumerate}
+
+\section{Streaming Wii Video to Another Machine}
+
+To stream video from the Wii, set up the host and client machines as follows:
+
+\begin{enumerate}
+	\item \textbf{On the Host Machine:}
+	      Run the broadcasting script:
+	      \begin{verbatim}
+./broadcast-rtp.sh
+    \end{verbatim}
+
+	\item \textbf{On the Client Machine:}
+	      Run the playback script:
+	      \begin{verbatim}
+./play-rtp.sh
+    \end{verbatim}
+
+
+	\item \textbf{Terminate the Streaming Session:}
+	      When you wish to stop streaming, press \texttt{q} on the client machine and then terminate the broadcast process by pressing \texttt{Ctrl+C} on the host machine.
+\end{enumerate}

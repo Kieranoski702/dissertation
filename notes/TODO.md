@@ -9,7 +9,6 @@ Questions for Tom:
 - List of tables and list of figures?
 
 Things to do:
-- Add user manual/more professional README as an appendix
 - Write a complete host script? (Maybe just user manual with current impl is fine?)
 - Write a complete client script? (Maybe just user manual with current impl is fine?)
 - Do network analysis when artificial high ping?

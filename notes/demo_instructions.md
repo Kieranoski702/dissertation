@@ -1,4 +1,4 @@
-# Dependecies for everything
+# Dependencies for everything
 ## xwiimote
 
 All this information can be found [here](https://github.com/marthjod/wiipy/)
@@ -48,7 +48,7 @@ First edit `/etc/bluetooth/input.conf`. Change the line `#ClassicBondedOnly=true
 3. Type `trust [address]` but press the 1 and 2 key on Wii remote before running
 4. Type `connect [address]` but press a button before running
 
-# Running Wii remote emulator (Seems to only work with GUI)
+# Running Wii remote emulator 
 
 https://github.com/rnconrad/WiimoteEmulator
 Wii mac address: 00:22:4C:19:DD:5F
@@ -66,8 +66,7 @@ Wii mac address: 00:22:4C:19:DD:5F
    - `sudo systemctl start bluetooth`
    - `sudo systemctl status bluetooth`
 
-# Streaming Wii video to other raspberry pi (Seems to only work in headless)
-
+# Streaming Wii video to other raspberry pi 
 1. On client pi (Pi 2) run `./play-rtp.sh`
 2. On host pi (Pi 1) run `./broadcast-rtp.sh`
 3. When finished press q on client pi then ctrl c on host pi
