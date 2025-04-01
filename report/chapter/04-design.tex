@@ -3,17 +3,13 @@
 
 This chapter presents an in-depth discussion of the system's design, examining
 the overall architecture, the rationale behind key design decisions, and the
-unique aspects that distinguish this project. The design of the system is
-inherently modular, partitioning functionality into defined subsystems that
-interact through well-specified interfaces. This approach not only promotes ease
-of development and testing but also facilitates future expansion and
-maintenance.
+unique aspects that distinguish this project.
 
 \section{System Architecture Overview}
 
 At a high level, the system comprises several loosely coupled components that
-work together to recreate a local multiplayer experience in a remote gaming
-context. Figure~\ref{fig:expanded_overview} illustrates the primary components
+work together to enable remote gameplay on the Nintendo Wii console.
+Figure~\ref{fig:expanded_overview} illustrates the primary components
 and their interactions.
 
 The primary subsystems include:
@@ -26,7 +22,7 @@ The primary subsystems include:
 
 	\item \textbf{Wiimote Emulator:}
 	      The emulator, derived from a fork\cite{jr_wiimote_emu} of the
-	      \texttt{WiimoteEmulator} project\cite{wiimote_emulator}, interprets the incoming
+	      \linebreak \texttt{WiimoteEmulator} project\cite{wiimote_emulator}, interprets the incoming
 	      UDP packets and simulates the corresponding Wii Remote inputs, which are then
 	      relayed to the Wii console via a Bluetooth connection. This project extends the
 	      emulator's functionality to include streaming IR and accelerometer data over
@@ -37,21 +33,20 @@ The primary subsystems include:
 	      An audiovisual streaming component enables remote gameplay by capturing
 	      video and audio outputs from the Wii console. The system transmits these streams
 	      to a client machine via the host machine using the Real-time Transport Protocol
-	      (RTP)\cite{wikipediaRTP}. A significant design challenge was the trade-off
-	      between stream quality and latency, leading to a careful tuning of encoding
-	      parameters and RTP settings.
+	      (RTP)\cite{wikipediaRTP}.
 
 	\item \textbf{Automation and Deployment:}
 	      An automation script applies system configurations  -- such as loading
-	      kernel modules and installation of dependencies  -- consistently across devices.
-	      This not only simplifies the initial setup but also mitigates issues that might
-	      arise from manual configuration errors.
+	      kernel modules and installation of dependencies  -- consistently across
+	      devices.  The setup is tedious, error-prone, and not user-friendly without
+	      automation. This problem compounds when considering the need to deploy the
+	      system across multiple devices for users of varying technical expertise.
 \end{itemize}
 
 \section{Controller Input Relay}
 
 \subsection{Design Rationale}
-The relay is a custom Python script, leveraging Python’s rapid development cababilities and its extensive library support. The integration with the \texttt{xwiimote} library was particularly attractive because it allowed for the efficient capture of diverse input events (e.g., accelerometer readings, IR signals, and button presses). This design decision provided a robust platform that could quickly adapts when new input modalities or requirements emerge.
+The relay is a custom Python script, leveraging Python’s rapid development capabilities and its extensive library support. The integration with the \texttt{xwiimote} library was particularly attractive because it allowed for the efficient capture of diverse input events (e.g., accelerometer readings, IR signals, and button presses). This design decision provided a robust platform that could quickly adapts when new input modalities or requirements emerge.
 
 \subsection{Communication Strategy}
 The relay utilises fixed-length binary packets that transmit over UDP to minimise communication latency and relay each sensor event in as close to real time as possible. The choice of UDP, despite its lack of error-checking compared to TCP\cite{wikipediaTCP}, was deliberate: it reduces overhead and is better suited for applications where timely data delivery is more critical than guaranteed packet delivery. All of the I/O operations in the relay are non-blocking, further enhancing responsiveness and ensuring that the system remains highly interactive.
@@ -65,12 +60,17 @@ Modularity was a guiding principle in the relay’s design. By mapping all input
 Instead of developing a Wii Remote emulator from scratch, the project builds upon the \texttt{WiimoteEmulator} project. Building a new Wii Remote emulator would have been too time-consuming and risked introducing bugs. One benefit of building an emulator from scratch would be the ability to minimise the latency between the emulator and the Wii console -- something that the \texttt{WiimoteEmulator} project didn't focus on. However, the latency introduced by the emulator doesn't make the games unplayable, as shown in the \nameref{sec:playability-analysis} section. Adapting an existing project allowed for a focus on design improvements rather than foundational re-implementation.
 
 \subsection{Enhanced Input Simulation}
- Extensions to the emulator support streaming IR and accelerometer data over UDP. This feature enables the remote player’s inputs to be accurately reflected in the Wii console’s gameplay. The original \texttt{WiimoteEmulator} project is able to emulate IR and accelerometer data but only through a mouse and keyboard interface. In addition, the original project calculates all the IR and accelerometer data in small movements, i.e. there is no way to quickly snap from one end of the screen to the other. Thus, the design improvements of the \texttt{WiimoteEmulator} project centre around fixing these shortcomings.
+Extensions to the emulator support streaming IR and accelerometer data over UDP. This feature enables the remote player’s inputs to be accurately reflected in the Wii console’s gameplay. The original \texttt{WiimoteEmulator} project is able to emulate IR and accelerometer data but only through a mouse and keyboard interface. In addition, the original project calculates all the IR and accelerometer data in small movements, i.e. there is no way to quickly snap from one end of the screen to the other. Thus, the improvements to the \texttt{WiimoteEmulator} project centre around fixing these shortcomings.
 
 \section{Audio and Video Streaming}
 
-\subsection{Protocol Selection and Trade-offs}
-Adopting the Real-time Transport Protocol (RTP) leverages its robust framework for live media streaming. RTP’s design supports low-latency transmission, which is essential for synchronising audiovisual output with user inputs. The design process involved carefully weighing the trade-offs between achieving high media quality and minimising transmission delay, with a preference for a configuration that favours timely delivery over maximal resolution.
+\subsection{Protocol Selection}
+Adopting the Real-time Transport Protocol (RTP) leverages its framework for live
+media streaming. RTP’s design supports low-latency transmission, which is
+essential for achieving the lowest latency possible. The use of other protocols, like
+UDP, was considered but ultimately rejected due to the lack of built-in support for
+audio and video streaming. It is not the use of RTP alone that reduces latency but the
+specific configurations that the protocol allows for which UDP does not.
 
 \subsection{Use of FFmpeg and FFplay}
 The system relies on FFmpeg\cite{wikipediaFFmpeg} and FFplay\cite{ffplay} for capturing and streaming audiovisual data. FFmpeg’s extensive codec support and FFplay’s real-time playback capabilities make them well-suited for this application. The design leverages these tools to ensure seamless audiovisual streaming, with FFplay providing a low-latency display of the Wii’s output on the client machine. Notably, this requires remote users to use FFplay, or similar tools that integrate with FFmpeg, to view the game stream. This restricts users to a possibly unfamiliar interface, but ensures a consistent experience across all clients.
@@ -78,7 +78,7 @@ The system relies on FFmpeg\cite{wikipediaFFmpeg} and FFplay\cite{ffplay} for ca
 \section{Automation and Deployment}
 
 \subsection{Centralised Configuration Management}
-A comprehensive setup script manages critical configuration task -- such as loading essential kernel modules, updating Bluetooth settings, and installing necessary libraries. Centralising these tasks into an automated process reduces the risk of inconsistencies and ensures that every deployment starts from a known baseline.
+A comprehensive setup script manages configuration tasks -- such as loading essential kernel modules, updating Bluetooth settings, and installing necessary libraries. Centralising these tasks into an automated process reduces the risk of inconsistencies and ensures that every deployment starts from a known baseline.
 
 \subsection{Accessibility and Usability}
 The automation script priorities user-friendliness and accessibility. By abstracting complex setup procedures into a single command, the script lowers the barrier to entry for users who may lack technical expertise. This design choice aligns with the project’s goal of providing an accessible and intuitive remote gaming experience meant for a broad audience.
@@ -113,7 +113,7 @@ A key design decision was to ensure that the deployment process could scale with
 % 	      The emulator on the host Raspberry Pi receives the UDP packets and integrates the data into its internal state. The emulation layer uses transformation routines to convert the incoming data into the simulated state of the Wii Remote, including generating IR positions and accelerometer readings.
 % \end{enumerate}
 
-\section{Unusual and Innovative Design Features}
+\section{Novel Design Features}
 
 \subsection{Responsive Motion Control Emulation}
 The system’s motion control emulation is a novel feature that enables remote players to interact with the game in real-time. By streaming IR and accelerometer data over UDP, the system accurately reflects the remote player’s inputs on the Wii console. Allowing a remote user to control the game as if they were physically present is a unique design feature that enhances the system’s immersive qualities.
