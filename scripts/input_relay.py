@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 """
-wiimote_to_emulator.py
-
 This script connects to a real Wiimote using the xwiimote Python3 bindings,
 reads events (for example, accelerometer data used here as a proxy for pointer
 position), and sends binary pointer update packets over UDP to the Wii Remote

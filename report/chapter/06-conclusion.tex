@@ -13,7 +13,9 @@ multiple complex components into a cohesive system. The implementation of a
 custom input relay, in tandem with a modified Wii Remote emulator, allowed for
 real-time transmission of controller inputs. This solution ensured that remote
 players could experience accurate and responsive control, even though some
-latency remained compared to native gameplay. Simultaneously, the audiovisual
+latency remained compared to native gameplay.
+
+Simultaneously, the audiovisual
 streaming subsystem managed to balance the trade-offs between media quality and
 latency, providing an immersive, real-time gaming experience. Overall, the
 system has demonstrated that with careful design and tuning, it is possible to
@@ -24,25 +26,27 @@ limitations. One key drawback was the persistent latency observed throughout the
 system. Although non-blocking I/O and aggressive buffering strategies reduced
 delays, the cumulative effect of video capture, encoding, network transmission,
 and emulation meant that some degree of lag remained -- particularly noticeable
-in fast-paced gaming scenarios. Additionally, limited peripheral support
+in fast-paced gaming scenarios.
+
+Additionally, limited peripheral support
 constrains the current implementation; the focus on the Wii Remote excludes
 important accessories like the nunchuck, thereby narrowing the scope of
 supported games. Manual accelerometer calibration also posed a challenge, as the
 fixed parameters did not adapt dynamically to different game requirements or
 user preferences.
 
-Looking ahead, several promising avenues exist for further refining and
-expanding the system. Enhancing peripheral integration is a clear priority; by
-incorporating additional input devices such as the nunchuck and other motion
-sensors, the system could offer a more comprehensive emulation of the Wii’s
-original capabilities. Furthermore, scalability testing and further optimisation
-are essential for accommodating multiple simultaneous connections without
-sacrificing performance. Future work might also explore adaptive, dynamic
-calibration techniques -- potentially leveraging machine learning -- to
-automatically fine-tune accelerometer inputs based on real-time gameplay data.
-Such advancements could narrow the performance gap between emulated and native
-experiences, ultimately delivering a more authentic and responsive gaming
-environment.
+% Looking ahead, several promising avenues exist for further refining and
+% expanding the system. Enhancing peripheral integration is a clear priority; by
+% incorporating additional input devices such as the nunchuck and other motion
+% sensors, the system could offer a more comprehensive emulation of the Wii’s
+% original capabilities. Furthermore, scalability testing and further optimisation
+% are essential for accommodating multiple simultaneous connections without
+% sacrificing performance. Future work might also explore adaptive, dynamic
+% calibration techniques -- potentially leveraging machine learning -- to
+% automatically fine-tune accelerometer inputs based on real-time gameplay data.
+% Such advancements could narrow the performance gap between emulated and native
+% experiences, ultimately delivering a more authentic and responsive gaming
+% environment.
 
 In conclusion, this dissertation has successfully explored the transformation of
 a nostalgic gaming console into a modern, remote multiplayer platform.  While

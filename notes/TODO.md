@@ -1,10 +1,12 @@
 Questions for Tom:
 
-- Do you have the other half of the feedback
-- Can we do experiment
 - I say that wii sport original had no online play. I know this is true but I cant find a source proving the negative. How can I source this/do I need to
 - Is requirements table correct format?
 - Should reference to figure 1.2 in design section be a duplication of the figure instead?
+- Do I need to add more on how I settled for config in section 7.3
+- I removed future work para in conclusion, is that okay?
+- In future work section of eval you say scalability testing with future work? comment what does this mean
+- What terms need defined?
 - Do I need a testing summary? 
 - List of tables and list of figures?
 

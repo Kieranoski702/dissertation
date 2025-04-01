@@ -41,18 +41,18 @@ Using the \texttt{bluetoothctl}\cite{bluetoothctl} command-line tool, to pair th
 	\item Enter \texttt{scan on} to start scanning for Bluetooth devices.
 	\item Immediately press the \textbf{1} and \textbf{2} buttons simultaneously on the Wii Remote to put it in pairing mode.
 	\item In the list of discovered bluetooth devices, find the Wii Remote and note its MAC address.
-  \item Put the Wii Remote into pairing mode and enter
-		\begin{verbatim}
+	\item Put the Wii Remote into pairing mode and enter
+	      \begin{verbatim}
 trust <Wii Remote MAC address>
 
 \end{verbatim}
-		to trust the Wii Remote.
+	      to trust the Wii Remote.
 
-  \item Put the Wii Remote into pairing mode and enter
-\begin{verbatim}
+	\item Put the Wii Remote into pairing mode and enter
+	      \begin{verbatim}
 connect <Wii Remote MAC address>
 \end{verbatim}
-		to establish a connection.
+	      to establish a connection.
 
 \end{enumerate}
 
@@ -104,31 +104,31 @@ The \texttt{broadcast-rtp.sh} script runs the following command:
 Table~\ref{tab:broadcast-args} explains the arguments used in the script in detail. See the official \texttt{ffmpeg} documentation for more information\cite{ffmpegDocumentation}. Notably, the script uses the \texttt{-preset ultrafast} option to minimise processing time and the \linebreak \texttt{-tune zerolatency} option to optimise the encoder for real-time transmission which reduces latency. It also uses the \texttt{-crf 17} option which sets the constant rate factor to 17. Constant rate factor (CRF) is a quality-based variable bitrate control method that adjusts the quality of the video stream while maintaining a constant bitrate. In the H.264 codec, the range of the CRF scale is 0–51, where 0 is lossless, 23 is the default, and 51 is worst quality possible. A lower value generally leads to higher quality. A CRF value of 17 or 18 is essentially visually lossless or nearly so\cite{ffmpegEncodeH264x2013}. Keeping the default CRF value of 23, along with the other latency reducing settings, results in video quality that is not acceptable as text and detail become illegible so to increase the quality, the system uses a CRF value of 17.
 
 \begin{table}[!ht]
-    \centering
-    \begin{tabular}{|p{5cm}|p{10cm}|}
-    \hline
-        Argument & Explanation \\ \hline
-        `-max\_delay 0` & Processes incoming packets immediately without waiting for additional data, reducing buffering delay. \\ \hline
-        `-max\_probe\_packets 1` & Limits probing to one packet to accelerate stream setup. \\ \hline
-        `-f v412` & Specifies the input format provided by the video capture device; ensures compatibility with the incoming video data. \\ \hline
-        `-framerate 25` & Sets the frame rate to 25 fps to balance smooth playback and processing load. \\ \hline
-        `-video\_size 720x576` & Defines the video resolution at 720x576 pixels. \\ \hline
-        `-threads 1` & Restricts encoding to a single thread for consistent low-latency performance. \\ \hline
-        `-i /dev/video0` & Specifies the video capture device as /dev/video0. \\ \hline
-        `-vcodec libx264` & Uses the H.264 encoder (libx264) for video encoding. \\ \hline
-        `-pix\_fmt:v yuv420p` & Enforces the yuv420p pixel format for wide compatibility with RTP receivers. \\ \hline
-        `-g:v 1` & Forces every frame to be a keyframe, which improves stream recovery and reduces latency. \\ \hline
-        `-preset ultrafast` & Minimises processing time by using the fastest encoding preset. \\ \hline
-        `-tune zerolatency` & Optimises the encoder for real-time transmission by reducing latency. \\ \hline
-        `-crf 17` & Sets the constant rate factor to balance quality and compression efficiency. \\ \hline
-        `-fflags +nobuffer` & Disables internal buffering in ffmpeg to minimise latency. \\ \hline
-        `-flags low\_delay` & Enables low-delay processing modes for reduced end-to-end latency. \\ \hline
-        `-f rtp` & Specifies the output format as RTP. \\ \hline
-        `-muxdelay 0` & Sets the multiplexing delay to zero, ensuring immediate packetisation of the stream. \\ \hline
-        `Output Destination: rtp://192.168.20.20:42423` & Designates the target IP address and port for the RTP stream transmission. \\ \hline
-    \end{tabular}
-\caption{\texttt{broadcast-rtp.sh} Argument Explanations}
-    \label{tab:broadcast-args}
+	\centering
+	\begin{tabular}{|p{5cm}|p{10cm}|}
+		\hline
+		Argument                                        & Explanation                                                                                                          \\ \hline
+		`-max\_delay 0`                                 & Processes incoming packets immediately without waiting for additional data, reducing buffering delay.                \\ \hline
+		`-max\_probe\_packets 1`                        & Limits probing to one packet to accelerate stream setup.                                                             \\ \hline
+		`-f v412`                                       & Specifies the input format provided by the video capture device; ensures compatibility with the incoming video data. \\ \hline
+		`-framerate 25`                                 & Sets the frame rate to 25 fps to balance smooth playback and processing load.                                        \\ \hline
+		`-video\_size 720x576`                          & Defines the video resolution at 720x576 pixels.                                                                      \\ \hline
+		`-threads 1`                                    & Restricts encoding to a single thread for consistent low-latency performance.                                        \\ \hline
+		`-i /dev/video0`                                & Specifies the video capture device as /dev/video0.                                                                   \\ \hline
+		`-vcodec libx264`                               & Uses the H.264 encoder (libx264) for video encoding.                                                                 \\ \hline
+		`-pix\_fmt:v yuv420p`                           & Enforces the yuv420p pixel format for wide compatibility with RTP receivers.                                         \\ \hline
+		`-g:v 1`                                        & Forces every frame to be a keyframe, which improves stream recovery and reduces latency.                             \\ \hline
+		`-preset ultrafast`                             & Minimises processing time by using the fastest encoding preset.                                                      \\ \hline
+		`-tune zerolatency`                             & Optimises the encoder for real-time transmission by reducing latency.                                                \\ \hline
+		`-crf 17`                                       & Sets the constant rate factor to balance quality and compression efficiency.                                         \\ \hline
+		`-fflags +nobuffer`                             & Disables internal buffering in ffmpeg to minimise latency.                                                           \\ \hline
+		`-flags low\_delay`                             & Enables low-delay processing modes for reduced end-to-end latency.                                                   \\ \hline
+		`-f rtp`                                        & Specifies the output format as RTP.                                                                                  \\ \hline
+		`-muxdelay 0`                                   & Sets the multiplexing delay to zero, ensuring immediate packetisation of the stream.                                 \\ \hline
+		`Output Destination: rtp://192.168.20.20:42423` & Designates the target IP address and port for the RTP stream transmission.                                           \\ \hline
+	\end{tabular}
+	\caption{\texttt{broadcast-rtp.sh} Argument Explanations}
+	\label{tab:broadcast-args}
 
 \end{table}
 
@@ -143,28 +143,36 @@ stream on the client machine. The script runs the following command:
   ffplay -vcodec h264 -max_delay 0 -analyzeduration 1 -protocol_whitelist file,udp,rtp -fflags nobuffer -strict experimental -framedrop -flags low_delay -probesize 32 -vf setpts=0 -sync ext rtp-h264.sdp
  \end{lstlisting}
 
-Table~\ref{tab:play-args} explains the arguments used in the script in detail. See the official \texttt{ffplay} documentation for more information\cite{ffplayDocumentation}. Notably, the script uses the \texttt{-sync ext} option to synchronise playback using an external clock, ensuring accurate timing with the incoming RTP stream. The \texttt{-framedrop} option drops frames if decoding lags, maintaining playback as close to real-time as possible. The \texttt{-flags low\_delay} option enforces low-delay processing to maintain alignment with the low-latency broadcast. The script also uses the \texttt{-probesize 32} option to set a minimal data probe size to reduce initialisation time. The \texttt{-vf setpts=0} option resets presentation timestamps to help maintain sync in a low-latency context. The \texttt{-strict experimental} option allows the use of experimental features if necessary for stream compatibility. The script also uses the \texttt{-protocol\_whitelist file,udp,rtp} option to whitelist the required protocols for reading the SDP file and handling the RTP stream. The \texttt{-max\_delay 0} option eliminates buffering delays on the playback side, promoting real-time viewing. The \texttt{-analyzeduration 1} option limits the analysis duration to speed up the startup process. The \texttt{-fflags nobuffer} option disables input buffering to reduce latency during playback. The script also specifies the input file as \texttt{rtp-h264.sdp}, which provides the SDP file that describes the RTP stream parameters, essential for interpreting the incoming data correctly
+Table~\ref{tab:play-args} explains the arguments used in the script in detail.
+See the official \texttt{ffplay} documentation for more
+information\cite{ffplayDocumentation}. Notably, the script uses the
+\texttt{-sync ext} option to synchronise playback using an external clock,
+ensuring accurate timing with the incoming RTP stream. The combination of the
+\texttt{-framedrop}, \texttt{-flags low\_delay}, \texttt{-max\_delay 0}, and
+\texttt{-fflags nobuffer} options \linebreak helps maintain real-time playback by dropping
+frames if necessary, minimising buffering delays, and enforcing low-delay
+processing.
 
 \begin{table}[!ht]
-    \centering
-    \begin{tabular}{|p{5cm}|p{10cm}|}
-    \hline
-        Argument & Explanation \\ \hline
-        `-vcodec h264` & Specifies that the incoming stream is encoded in H.264, ensuring the correct decoder is used. \\ \hline
-        `-max\_delay 0` & Eliminates buffering delays on the playback side, promoting real-time viewing. \\ \hline
-        `-analyzeduration 1` & Limits the analysis duration to speed up the startup process. \\ \hline
-        `-protocol\_whitelist file,udp,rtp` & Whitelists required protocols (file, UDP, RTP) for reading the SDP file and handling the RTP stream. \\ \hline
-        `-fflags nobuffer` & Disables input buffering to reduce latency during playback. \\ \hline
-        `-strict experimental` & Allows usage of experimental features if necessary for stream compatibility. \\ \hline
-        `-framedrop` & Drops frames if decoding lags, keeping playback as close to real-time as possible. \\ \hline
-        `-flags low\_delay` & Enforces low-delay processing to maintain alignment with the low-latency broadcast. \\ \hline
-        `-probesize 32` & Sets a minimal data probe size (32 bytes) to reduce initialisation time. \\ \hline
-        `-vf setpts=0` & Resets presentation timestamps to help maintain sync in a low-latency context. \\ \hline
-        `-sync ext` & Synchronises playback using an external clock for accurate timing with the RTP stream. \\ \hline
-        `Input File: rtp-h264.sdp` & Provides the SDP file that describes the RTP stream parameters, essential for interpreting the incoming data correctly. \\ \hline
-    \end{tabular}
-\caption{\texttt{play-rtp.sh} Argument Explanations}
-    \label{tab:play-args}
+	\centering
+	\begin{tabular}{|p{5cm}|p{10cm}|}
+		\hline
+		Argument                            & Explanation                                                                                                             \\ \hline
+		`-vcodec h264`                      & Specifies that the incoming stream is encoded in H.264, ensuring the correct decoder is used.                           \\ \hline
+		`-max\_delay 0`                     & Eliminates buffering delays on the playback side, promoting real-time viewing.                                          \\ \hline
+		`-analyzeduration 1`                & Limits the analysis duration to speed up the startup process.                                                           \\ \hline
+		`-protocol\_whitelist file,udp,rtp` & Whitelists required protocols (file, UDP, RTP) for reading the SDP file and handling the RTP stream.                    \\ \hline
+		`-fflags nobuffer`                  & Disables input buffering to reduce latency during playback.                                                             \\ \hline
+		`-strict experimental`              & Allows usage of experimental features if necessary for stream compatibility.                                            \\ \hline
+		`-framedrop`                        & Drops frames if decoding lags, keeping playback as close to real-time as possible.                                      \\ \hline
+		`-flags low\_delay`                 & Enforces low-delay processing to maintain alignment with the low-latency broadcast.                                     \\ \hline
+		`-probesize 32`                     & Sets a minimal data probe size (32 bytes) to reduce initialisation time.                                                \\ \hline
+		`-vf setpts=0`                      & Resets presentation timestamps to help maintain sync in a low-latency context.                                          \\ \hline
+		`-sync ext`                         & Synchronises playback using an external clock for accurate timing with the RTP stream.                                  \\ \hline
+		`Input File: rtp-h264.sdp`          & Provides the SDP file that describes the RTP stream parameters, essential for interpreting the incoming data correctly. \\ \hline
+	\end{tabular}
+	\caption{\texttt{play-rtp.sh} Argument Explanations}
+	\label{tab:play-args}
 
 \end{table}
 
@@ -173,7 +181,7 @@ Table~\ref{tab:play-args} explains the arguments used in the script in detail. S
 
 \section{Python Script for Input Relay}
 A core component of the project is the custom Python script
-(\texttt{wiimote\_to\_emulator.py}) that serves as a bridge between the physical
+(\texttt{input\_relay.py}) that serves as a bridge between the physical
 Wii Remote and the emulation backend running on the host Raspberry Pi. This
 script leverages the \texttt{xwiimote} Python bindings to interface directly
 with the Wii Remote hardware, continuously monitoring for various input events
@@ -189,7 +197,7 @@ Using the \texttt{select.poll()} mechanism, the script sets up non-blocking I/O 
 Depending on the event type, the script processes the data accordingly:
 
 \subsubsection{Accelerometer Events}
-When the machine receives an accelerometer event (identified by \texttt{xwiimote.EVENT\_ACCEL}), the script retrieves the raw accelerometer values from channel 0. It then normalises these values (using a custom scaling and offset transformation) and packs them into a binary packet with the header \texttt{0x02}. The binary format is:
+When the machine receives an accelerometer event (identified by \linebreak \texttt{xwiimote.EVENT\_ACCEL}), the script retrieves the raw accelerometer values from channel 0. It then normalises these values (using a custom scaling and offset transformation) and packs them into a binary packet with the header \texttt{0x02}. The binary format is:
 \begin{center}
 	\texttt{[1 byte event type (0x02)] + [4 bytes float ax] +}
 	\texttt{[4 bytes float ay] + [4 bytes float az]}
@@ -203,7 +211,15 @@ For IR events (identified by \texttt{xwiimote.EVENT\_IR}), the script retrieves 
 \end{center}
 
 \subsubsection{Button (Key) Events:}
-The script also processes key events (e.g., pressing the \texttt{+}, \texttt{-}, \texttt{HOME}, \texttt{A}, and \texttt{B} buttons). The input relay handles these by sending text-based command packets (e.g., \texttt{"button 1 WIIMOTE\_PLUS"}) over UDP to indicate button press and release actions.
+The script also processes key events (e.g., pressing the \texttt{+}, \texttt{HOME}, \texttt{A}, etc buttons). For context, Figure~\ref{fig:wiimote_buttons} shows the layout of the Wii Remote buttons. The input relay handles these by sending text-based command packets (e.g., \texttt{"button 1 WIIMOTE\_PLUS"}) over UDP to indicate button press and release actions.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.6\textwidth]{wii_remote.png}
+	\caption{Wii Remote Button Layout. Image source\cite{wiimoteButtons}}
+	\label{fig:wiimote_buttons}
+\end{figure}
+
 
 \subsection{UDP Communication:}
 The script creates a UDP socket to transmit the binary (and text-based) update packets to the Wii Remote Emulator. The user provides the IP address and port of the host machine running the Wii Remote emulator via command-line arguments. The script logs key actions and any errors using Python’s built-in logging facilities, ensuring that debugging information is available during operation.
@@ -217,19 +233,19 @@ The system’s final major component is the emulation of the Wii Remote on the h
 Raspberry Pi. The implementation utilises a modified version of the
 \texttt{WiimoteEmulator} originally developed by Ryan
 Conrad\cite{wiimote_emulator} (known as rnconrad on GitHub).
-\texttt{WiimoteEmulator} is able to emulate a bluetooth wii controller in
-software, enabling control of the wii through various different input devices such
+\texttt{WiimoteEmulator} is able to emulate a Bluetooth Wii controller in
+software, enabling control of the Wii through various different input devices such
 as a keyboard, mouse, or text commands over a network.
 
 More specifically, this project builds on a fork of the project by
 JRogaishio\cite{jr_wiimote_emu} as it fixes two critical bugs. The first bug is
-that the ip command in the original project was not working due to an index
+that the IP command in the original project was not working due to an index
 error. The second bug is that the original project was not compiling due to a
 call to \texttt{graceful\_disconnect()} which was not defined.
 
-The version built in this project\cite{kf_wiimote_emu} builds upon this fork by adding support for transmitting IR and accelerometer data through the IP socket interface.
+The version created in this project\cite{kf_wiimote_emu} builds upon this fork by adding support for transmitting IR and accelerometer data through the IP socket interface.
 
-\subsection{Enhancements and Challenges}
+\subsection{Enhancements}
 
 
 \subsubsection{IR Emulation}
@@ -237,19 +253,37 @@ The version built in this project\cite{kf_wiimote_emu} builds upon this fork by 
 IR emulation in the system is responsible for generating the infrared (IR)
 sensor data that the Wii Remote expects when pointing at a sensor bar. The
 implementation leverages the functions defined in \texttt{motion.c}. First, the
-function \texttt{look\_at\_pointer} computes a transformation matrix based on
+function \linebreak \texttt{look\_at\_pointer} computes a transformation matrix based on
 normalised pointer coordinates (\texttt{pointer\_x} and \texttt{pointer\_y}).
 This matrix defines the orientation of the emulated Wii Remote relative to a
 virtual screen, factoring in physical dimensions (e.g., screen width, sensor bar
 width) and viewing distance.
 
 Next, \texttt{set\_motion\_state} uses this transformation to compute two sensor
-points (\texttt{sensor\_pt0} and \texttt{sensor\_pt1}).  A custom perspective projection matrix \linebreak(\texttt{make\_cam\_projection\_mat}) projects these points into a normalised coordinate system. After normalising the homogeneous coordinate, the resulting positions map to
-the resolution expected by the Wii Remote (typically a range of 0-1023 in x and
-0-767 in y). The size of each IR object is also computed based on the depth
-component (\texttt{z}) of the projected points, simulating the apparent size
-changes of IR sources with distance. This process ensures that the emulated IR
-data closely mimics the signals generated by a physical sensor bar.
+points (\texttt{sensor\_pt0} and \texttt{sensor\_pt1}). In this process, a sensor point is defined as
+\[
+p = (p_x, p_y, p_z, p_w)
+\]
+
+
+A custom perspective projection matrix (\texttt{make\_cam\_projection\_mat}) projects these points into a normalised coordinate system. Putting a sensor point through this perspective divide and normalisation yields:
+
+\[
+p' = \left(\frac{p_x}{p_w},\, \frac{p_y}{p_w},\, \frac{p_z}{p_w}\right).
+\]
+
+The normalised coordinates are then mapped to screen space and used to compute the IR sensor output as follows:
+\[
+\begin{aligned}
+x_{\text{ir}} &= \text{round}\!\Bigl(1023 \cdot \frac{p'_x + 1}{2}\Bigr),\\[1mm]
+y_{\text{ir}} &= \text{round}\!\Bigl(767 \cdot \frac{p'_y + 1}{2}\Bigr),\\[1mm]
+\text{size} &= \text{round}\!\Bigl(\text{min\_pt\_size} + \Bigl(1 - p'_z\Bigr)^2 \cdot \bigl(\text{max\_pt\_size} - \text{min\_pt\_size}\bigr)\Bigr),
+\end{aligned}
+\]
+with \(\text{min\_pt\_size} = 1.0\) and \(\text{max\_pt\_size} = 15.0\).
+
+This process ensures that the emulated IR data closely mimics the signals produced by a real Wii Remote when pointing at a sensor bar.
+
 
 \subsubsection{Accelerometer Emulation}
 
@@ -273,30 +307,27 @@ state->usr.accel_z = event.analog_motion_event.z;
 
 The input relay normalises the raw accelerometer data before transmitting it to the emulator. Thus, the Wii Remote emulator can directly use these values to update the emulated Wii Remote’s accelerometer state.
 
-\subsubsection{Latency}
+\subsubsection{Latency Reduction}
 
 Latency is a critical performance metric when determining the playability of video games. In general, the lower the latency, the more responsive the game feels to the player. As such, minimising latency across the system was a key focus during development. The system employs several strategies to reduce latency and improve responsiveness, including:
 
 \begin{itemize}
 	\item \textbf{Non-blocking I/O:} In the \texttt{input\_socket.c} file, UDP
-	      sockets use the \texttt{SOCK\_NONBLOCK} flag to ensure that the
-	      system can continuously poll for new input events without stalling on network
-	      reads. This approach is essential for maintaining responsiveness.
-
+	      sockets use the \linebreak \texttt{SOCK\_NONBLOCK} flag to ensure that the system
+	      can continuously poll for new input events without stalling on network reads.
+	      Without this flag, the emulator would block on network reads meaning that the
+	      emulator would not be able to process any other events until the network read is
+	      complete. This is especially important since the input relay is streaming the IR
+	      and accelerometer data to the emulator in close to real-time so the emulator
+	      could miss multiple events if it was blocking on reads.
 	\item \textbf{Optimised Data Pipelines:} The system uses lightweight binary
 	      protocols for both IR and accelerometer updates. Sending fixed-length packets
 	      (e.g., 13-byte packets for IR and accelerometer data) reduces the overhead associated
-	      with parsing and error checking, improving overall throughput.
-
-	\item \textbf{Increase Polling Frequency:} The original
-	      \texttt{WiimoteEmulator} project uses a 20ms polling interval for reading input
-	      events. By decreasing this value, thus increasing the polling frequency, the
-	      system can respond more rapidly to incoming data, reducing the overall latency
-	      of the system.
+	      with parsing, improving overall throughput.
 
 \end{itemize}
 
-Despite these efforts, some latency issues remain due to the inherent latency present in the \texttt{WiimoteEmulator}. Further work on the \texttt{WiimoteEmulator} project should aim to address these challenges and improve the overall responsiveness of the system.
+A shown in the \nameref{sec:playability-analysis}, the latency introduced by the emulator is minimal, with the majority of latency stemming from the video streaming component.
 
 \section{Automation of Device Setup}
 

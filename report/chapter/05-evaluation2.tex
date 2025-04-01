@@ -3,10 +3,127 @@
 
 This chapter evaluates the system with respect to the original objectives, and it critically compares the projects approach to related work in the field. Specifically, it assesses the system's playability, identifies challenges encountered during development, and outlines solutions to these issues. The chapter also discusses the limitations of the system and suggests areas for future work.
 
+\section{Experimental Setup}
+\label{sec:experimental-setup}
+
+The core hardware comprised a Nintendo Wii system, two complete sets of Raspberry Pi units (each paired with a monitor and keyboard), and multiple Wii Remote controllers. A network switch was used to interconnect the devices on a closed, direct Ethernet network. To support gameplay evaluation, a disk copy of a split-screen multiplayer Wii game -- Mario Kart in this case -- was used, ensuring that the system was tested under conditions closely resembling a typical gaming scenario.
+
+In the playability analysis setup, the configuration was modified slightly to accommodate specialised measurement requirements. The Wii’s video output was split using a composite splitter, which enabled the signal to be simultaneously routed to the USB composite capture device attached to one Raspberry Pi and to an extra monitor. This additional monitor served to display the original, real-time composite output from the Wii, providing a baseline for latency comparisons. This additional display allowed for a direct, real-time view of the Wii’s output which doesn't go through the capture device. By comparing the real-time composite feed with the processed stream, the analysis could isolate and quantify any additional delays introduced during capture, encoding, network transmission, and decoding.
+
 \section{Playlability Analysis}
 \label{sec:playability-analysis}
 
+The playability analysis takes into account 5 distinct parts of the system that
+contribute to the overall interaction lag\cite{volkerseekerBestPaper}.
 
+\subsection{Latency of Audiovisual Transmission}
+
+The first test focused on quantifying the delay in the complete video path—from
+the moment the signal left the Wii, through capture by the composite device,
+encoding on the host machine, network transmission, decoding by the client
+machine, and finally its display on the client monitor. To determine this delay,
+both the client monitor and the additional monitor (showing the direct Wii
+output) were recorded simultaneously. Analysis of the recordings revealed a
+consistent lag of 21 frames between the two displays. Given that the video was
+captured at 25 frames per second and played back at one-eighth speed, this delay
+corresponds to approximately 105 milliseconds of lag. This measured latency
+encompasses the cumulative delays inherent in video capture, encoding, and
+decoding, offering a clear benchmark for the audiovisual subsystem’s
+performance.
+
+\subsection{Wii Remote Emulator Latency}
+
+The second test evaluated the performance of the Wii Remote emulator itself. By
+incorporating a \texttt{gettimeofday} call in the C code immediately upon receiving an
+input from the network and again right after dispatching the corresponding
+emulated input, the latency intrinsic to the emulation process was determined and output to the terminal.
+The results, shown in Listing~\ref{lst:emulator}, indicate that the average
+latency for IR data was 1511 microseconds (1.511 milliseconds), while the
+accelerometer and button data exhibited average delays of 1498 and 5388
+microseconds (1.498 and 5.388 milliseconds), respectively. These measurements
+illustrate that the emulation system introduces only minimal delays.
+
+
+\begin{lstlisting}[caption={Wii Remote Emulator Latency Results}, label=lst:emulator, mathescape=true,]
+  IR:         average 1511 $\mu$s (1326 samples)
+  Accelerometer: average 1498 $\mu$s (1457 samples)
+  Button:     average 5388 $\mu$s (25 samples)
+\end{lstlisting}
+
+\subsection{Input Relay System Latency}
+
+The third test assessed the efficiency of the Python-based input relay
+system. Similar in concept to the emulator test, this measurement was conducted
+by recording timestamps using Python’s \texttt{time.monotonic()} function immediately
+before an input was processed and again right after it was sent over the UDP
+socket then printing the results to the terminal. The results, shown in
+Listing~\ref{lst:inputrelay}, show that the latency of the input relay system is
+negligible, with average delays of 18, 13, and 18 microseconds for the
+accelerometer, IR, and button inputs, respectively. These results confirm that the input
+relay mechanism imposes an extremely minor delay.
+
+\begin{lstlisting}[caption={Input Relay System Latency Results}, label=lst:inputrelay, mathescape=true]
+INFO:wiimote_streamer:  Accelerometer: average 18 $\mu$s (3389 samples)
+INFO:wiimote_streamer:  IR:            average 13 $\mu$s (3058 samples)
+INFO:wiimote_streamer:  Button:        average 18 $\mu$s (26 samples)
+\end{lstlisting}
+
+\subsection{Network Latency}
+
+The fourth test concentrated on the network latency between the host and client
+machines. In this evaluation, the Raspberry Pis were connected directly via
+Ethernet within a closed network, a configuration that minimises external
+interference. The command \texttt{ping -c 100 -i 0.2 192.168.20.10} was executed to
+collect latency statistics. The analysis, shown in Listing~\ref{lst:network},
+revealed an average round-trip time (RTT) of 0.203 milliseconds as well as a
+minimum and maximum RTT of 0.190 and 0.289 milliseconds, respectively. The results
+demonstrate that the network latency of the system is very low. It is important to note that while these values demonstrate extremely low latency on a
+dedicated network, typical home networks experience latencies in
+the 30–100ms range on average\cite{latencySurvey}.
+
+\begin{lstlisting}[caption={Network Latency Results}, label=lst:network]
+--- 192.168.20.10 ping statistics ---
+100 packets transmitted, 100 received, 0% packet loss, time 20195ms
+rtt min/avg/max/mdev = 0.190/0.203/0.289/0.010 ms
+\end{lstlisting}
+
+
+
+\subsection{Bluetooth Latency:}
+
+In this project, the Bluetooth latency of the Wii Remote was not directly
+measured, however, measurements of Wii Remote latency have
+been conducted by others. The MiSTer FPGA Input Latency
+Tester\cite{cathoderayblogTestYour} is a tool that can measure the latency of
+various controllers, including the Wii Remote. A collection of measurements from
+this tool called the ``MiSTer Input Lag Database''\cite{misterInputLagDatabase}
+shows that the Wii Remote has an average latency of 34.115 to 36.071
+milliseconds. From this data, it can be inferred that the Bluetooth latency of
+the Wii Remote is approximately 35 milliseconds which is a significant
+contribution to the overall system latency.
+
+\subsection{Overall Interaction Lag}
+
+The interaction lag, defined as the delay between a user’s input and the
+corresponding on-screen response\cite{volkerseekerBestPaper}, can be calculated by
+summing the latencies of each part of the system. In this setup, the total interaction lag is:
+
+\begin{align*}
+  \text{Total Interaction Lag} &= \text{Audiovisual Latency} + \text{Wii Remote Emulator Latency} \\
+  &+ \text{Input Relay System Latency} + \text{Network Latency} \\
+  &+ (\text{Bluetooth Latency} * 2) \\
+  &= 105 + 5.388 + 0.018 + 0.203 + (35 * 2) \\
+  &= 180.609 \text{ milliseconds}
+\end{align*}
+
+This total is assuming the worst case (button press) for the Wii Remote emulator
+and input relay system latencies. The Bluetooth latency is multiplied by two to
+account for the fact that there is a Bluetooth connection between the Wii Remote
+and the client machine as well as between the Wii Remote emulator running on the
+host machine and the Wii Console. The network lag is only counted once as the
+Audiovisual latency includes the network latency on the trip back to the client
+machine. Note that using a typical home network with latencies in the 30-100ms
+range would increase the total interaction lag to 240-380ms.
 
 \section{Challenges and Solutions}
 
@@ -29,38 +146,14 @@ vec3 pointer_world = {(pointer_x - 0.5) * screen_width, (pointer_y)*screen_width
 By correcting this error, the IR sensor data was correctly positioned on the screen, allowing for accurate pointing and cursor control. This fix was crucial for maintaining the playability of IR-dependent games.
 
 \subsubsection{Audiovisual Streaming}
+The initial implementation of the streaming pipeline suffered from high latency and frequent buffering issues, resulting in a sub-optimal user experience. To address these challenges, the system underwent several rounds of optimisation, focusing on reducing delay while maintaining media quality.
 
-The audiovisual streaming component is a critical element in delivering an
-engaging remote gameplay experience. The system utilises the Real-time Transport
-Protocol (RTP) as its backbone for transmitting both video and audio streams.
-RTP is well suited to handling real-time data over IP networks,
-where timely delivery is as important as data integrity.
+Manual tests refined the audiovisual streaming component by evaluating each parameter adjustment for its impact on latency and video quality. After trying each option, the system’s response was observed in real time to assess whether the perceptible latency met the requirements for responsive gameplay and whether any degradation in video quality was within acceptable limits.
 
-To minimise delay while preserving media quality, the streaming pipeline relies
-on the open-source \texttt{ffmpeg} framework. The broadcasting script
-(\texttt{broadcast-rtp.sh}) is finely tuned with parameters that target a
-reduction in buffering and processing overhead. For example, flags such as
-\texttt{-max\_delay 0} and \texttt{-fflags +nobuffer} ensure immediate
-processing of incoming packets without accumulating extra data. Similarly, the
-\texttt{-preset ultrafast} and \texttt{-tune zerolatency} options accelerate
-encoding, even if this occasionally comes at the expense of compression
-efficiency.
+Initially, the adoption of options such as \texttt{-preset ultrafast} and \linebreak \texttt{-tune zerolatency} resulted in the most significant reduction in noticeable latency. However, these settings also led to a decline in video quality, introducing compression artefacts and reduced image clarity that hampered the overall viewing experience. In contrast, incorporating the \texttt{-crf 17} parameter improved the visual quality substantially. Although it introduced a slight increase in the latency, this trade-off proved acceptable as the added delay was barely perceptible, while the quality enhancement ensured that details remained crisp and legible during fast-paced gameplay.
 
-On the client side, the playback script (\texttt{play-rtp.sh}) mirrors these
-optimisations by disabling internal buffering (\texttt{-fflags nobuffer}) and
-enabling low-delay decoding strategies (\texttt{-flags low\_delay} and
-\texttt{-framedrop}). The inclusion of a dedicated SDP file further aids in
-accurately interpreting the stream parameters, reducing the initial
-synchronisation overhead.
+This iterative testing and fine-tuning process ultimately converged on the final set of streaming parameters, shown in section~\ref{sec:audio-video-streaming}, that best balanced low latency with high video quality. The final configuration represents a carefully considered compromise, ensuring that the audiovisual streaming pipeline delivers a responsive and visually satisfactory experience for remote gameplay.
 
-The combined effect of these settings is a streaming setup that strikes a
-balance between media fidelity and transmission speed. Although higher quality
-settings tend to increase processing delays, the current configuration offers a
-compromise that preserves the authenticity of the Wii experience in remote
-environments. % Iterative testing under varied network conditions has demonstrated
-% that, while occasional buffering delays may occur, the system generally
-% maintains acceptable audiovisual quality without compromising the interactive
-% aspect of gameplay.
 
 \subsubsection{Latency}
 
@@ -84,15 +177,12 @@ Wii Remote to the emulator, further mitigates latency by employing non-blocking
 I/O and a lightweight binary protocol. By packaging sensor data (IR and
 accelerometer values) into fixed-length packets and transmitting them over UDP,
 the system avoids the overhead associated with more complex data formats.
-Additionally, reducing the polling interval in the \texttt{WiimoteEmulator} from
-the original 20 ms to a shorter duration allows the system to react more swiftly
-to user inputs.
 
 Despite these efforts, some latency remains when compared to native Wii
-gameplay. The inherent delay introduced by network transmission and the
-processing limitations of the emulation environment contribute to a noticeable,
-albeit reduced, lag. For fast-paced or highly reactive gaming scenarios, even
-these minimised delays could affect user performance.
+gameplay. As shown in the \nameref{sec:playability-analysis}, the system
+has a total interaction lag of approximately 200milliseconds with the audiovisual
+streaming contributing 105 milliseconds of this. This latency is noticeable in
+fast-paced games but is still within a playable range.
 
 \section{Limitations}
 
@@ -132,17 +222,18 @@ inputs without compromising performance.
 Latency remains a critical limitation, as it directly impacts both the
 responsiveness of the audiovisual streaming and the precision of input relays.
 Despite several optimisation strategies -- such as the use of non-blocking I/O,
-aggressive buffering controls, and emulation improvements -- a noticeable delay
+tuned streaming settings, and emulation improvements -- a noticeable delay
 persists when compared to native Wii gameplay. This residual latency arises from
 the cumulative delay introduced at various stages, including video capture,
-encoding, network transmission, decoding, input processing, and emulation. Such
-delays are particularly detrimental in fast-paced gaming scenarios where every
-millisecond matters. To further mitigate latency, future work could explore more
-advanced compression algorithms, refine the UDP transmission pipeline, or
-experiment with alternative low-latency streaming protocols. Additionally,
-implementing predictive buffering or adaptive latency compensation algorithms
-might help offset some of the unavoidable delays, thereby enhancing the overall
-responsiveness of the system.
+encoding, network transmission, decoding, input processing, and emulation.
+However, the largest contributor to latency is the audiovisual streaming
+pipeline, which accounts for approximately 105 milliseconds of the total
+interaction lag as shown in section~\ref{sec:playability-analysis}. To further
+mitigate latency, future work could explore more advanced compression
+algorithms, refine the UDP transmission pipeline, or experiment with alternative
+low-latency streaming protocols. Additionally, implementing predictive buffering
+or adaptive latency compensation algorithms might help offset some of the
+unavoidable delays, thereby enhancing the overall responsiveness of the system.
 
 \subsection{Accelerometer Calibration}
 
@@ -166,59 +257,65 @@ calibration which would be the ideal solution.
 
 \section{Reflection and Future Work}
 
-% \subsection{Evaluation of Objectives}
-% As stated in the \hyperlink{chapter:introduction}{Introduction} chapter, the key objectives of the project were:
-
-% \begin{enumerate}
-% 	\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
-% 	\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
-% 	\item Evaluate the system’s performance and user experience in a real-world setting.
-% \end{enumerate}
-
-% Reflecting on the project in respect to these objectives, it is clear that the project successfully fulfils all three objectives. The system developed is capable of capturing and streaming the Wii’s video and audio output to remote players, relaying the Wii Remote’s controller data over a low-latency network connection, and has been evaluated in a real-world setting. The \nameref{sec:playability-analysis} section demonstrates that the system is capable of providing a playable experience for users, despite some limitations.
-%
 \subsection{Evaluation of Objectives}
-Reflecting on the project’s primary goals, it is evident that the system has successfully addressed the key challenges outlined in the \hyperlink{chapter:introduction}{Introduction}.
+As stated in the \nameref{chapter:introduction}, the key objectives of the project were:
 
-\subsubsection{Objective 1: Capturing and Streaming the Wii's Video and Audio Output}
-This objective focuses on the development and integration of automated scripts
-specifically designed to capture and stream the Wii's audiovisual data. The
-broadcasting script (\texttt{broadcast-rtp.sh}) plays a crucial role by
-leveraging the Real-time Transport Protocol (RTP) in conjunction with
-\texttt{ffmpeg} to encode and transmit video and audio data with minimal
-buffering. The script's carefully tuned parameters -- including non-buffered input,
-forced keyframes, and low-latency encoding settings ensure that the streaming
-pipeline efficiently manages the trade-off between media quality and
-transmission delay. On the client side, the playback script
-(\texttt{play-rtp.sh}) mirrors these optimisations to maintain synchronisation
-and reduce decoding overhead. Together, these scripts automate the processes
-required for capturing the Wii’s output, ensuring that remote players receive a
-real-time and immersive multimedia experience.
+\begin{enumerate}
+	\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
+	\item Develop a system to relay the Wii Remote’s controller data over a low-latency network connection.
+	\item Evaluate the system’s performance and user experience in a real-world setting.
+\end{enumerate}
 
-\subsubsection{Objective 2: Relaying the Wii Remote's Controller Data over a Low-Latency Network Connection}
-The second objective centres on the relay of controller data from the Wii Remote
-to the Wiimote emulator. First, a custom Python-based input relay system, built
-using the xwiimote Python bindings, captures real-time input events -- including
-button presses, accelerometer data, and IR signals -- and translates them into
-fixed-length binary packets. By adopting a lightweight binary protocol over UDP,
-the input relay minimises overhead, thereby ensuring low-latency transmission.
-In addition, enhancements made to the Wiimote Emulator enable it to accurately
-interpret these packets, thereby seamlessly integrating the physical controller
-inputs into the virtual environment. The combined approach of precise input
-relay and robust Wii Remote emulation confirms that the system meets the
-objective of providing responsive and accurate control for remote gameplay.
+Reflecting on the project in respect to these objectives, it is clear that the
+project successfully fulfils all three objectives. The system developed is
+capable of capturing and streaming the Wii’s video and audio output to remote
+players, relaying the Wii Remote’s controller data over a low-latency network
+connection, and has been evaluated in a real-world setting. The
+\nameref{sec:playability-analysis} demonstrates that the system is capable of
+providing a playable experience for users, despite some limitations.
 
-\subsubsection{Objective 3: Evaluating System Performance and User Experience}
-The final objective involves a comprehensive playability analysis measuring
-system performance under realistic conditions. This analysis quantifies latency
-across different system stages, with detailed measurements assessing network
-latency during data transmission, the overhead introduced by the emulation
-process, and the interaction lag\cite{volkerseekerBestPaper} -- that is, the delay between a user’s input
-and the corresponding on-screen response. The findings indicate that while the
-latency is within a playable range, a measurable interaction lag remains. This
-evaluation not only validates the system's capability to deliver a playable
-gaming experience but also highlights specific areas where further optimisation
-can bring the performance closer to that of native Wii gameplay.
+% \subsection{Evaluation of Objectives}
+% Reflecting on the project’s primary goals, it is evident that the system has successfully addressed the key challenges outlined in the \hyperlink{chapter:introduction}{Introduction}.
+
+% \subsubsection{Objective 1: Capturing and Streaming the Wii's Video and Audio Output}
+% This objective focuses on the development and integration of automated scripts
+% specifically designed to capture and stream the Wii's audiovisual data. The
+% broadcasting script (\texttt{broadcast-rtp.sh}) plays a crucial role by
+% leveraging the Real-time Transport Protocol (RTP) in conjunction with
+% \texttt{ffmpeg} to encode and transmit video and audio data with minimal
+% buffering. The script's carefully tuned parameters -- including non-buffered input,
+% forced keyframes, and low-latency encoding settings ensure that the streaming
+% pipeline efficiently manages the trade-off between media quality and
+% transmission delay. On the client side, the playback script
+% (\texttt{play-rtp.sh}) mirrors these optimisations to maintain synchronisation
+% and reduce decoding overhead. Together, these scripts automate the processes
+% required for capturing the Wii’s output, ensuring that remote players receive a
+% real-time and immersive multimedia experience.
+
+% \subsubsection{Objective 2: Relaying the Wii Remote's Controller Data over a Low-Latency Network Connection}
+% The second objective centres on the relay of controller data from the Wii Remote
+% to the Wiimote emulator. First, a custom Python-based input relay system, built
+% using the xwiimote Python bindings, captures real-time input events -- including
+% button presses, accelerometer data, and IR signals -- and translates them into
+% fixed-length binary packets. By adopting a lightweight binary protocol over UDP,
+% the input relay minimises overhead, thereby ensuring low-latency transmission.
+% In addition, enhancements made to the Wiimote Emulator enable it to accurately
+% interpret these packets, thereby seamlessly integrating the physical controller
+% inputs into the virtual environment. The combined approach of precise input
+% relay and robust Wii Remote emulation confirms that the system meets the
+% objective of providing responsive and accurate control for remote gameplay.
+
+% \subsubsection{Objective 3: Evaluating System Performance and User Experience}
+% The final objective involves a comprehensive playability analysis measuring
+% system performance under realistic conditions. This analysis quantifies latency
+% across different system stages, with detailed measurements assessing network
+% latency during data transmission, the overhead introduced by the emulation
+% process, and the interaction lag\cite{volkerseekerBestPaper} -- that is, the delay between a user’s input
+% and the corresponding on-screen response. The findings indicate that while the
+% latency is within a playable range, a measurable interaction lag remains. This
+% evaluation not only validates the system's capability to deliver a playable
+% gaming experience but also highlights specific areas where further optimisation
+% can bring the performance closer to that of native Wii gameplay.
 
 
 \subsection{Comparison with Related Work}
@@ -235,7 +332,8 @@ original projects.
 Cloud gaming platforms traditionally deploy extensive infrastructure and
 proprietary solutions to manage audiovisual streams. This allows for
 high-quality, low-latency streaming, but it comes at huge monetary and technical
-cost\cite{cloud_survey}. In contrast, this project's solution uses open-source tools and
+cost\cite{cloudSurvey}.
+In contrast, this project's solution uses open-source tools and
 protocols to achieve similar functionality. This system has higher latency and lower quality than
 commercial cloud gaming services, but everything can run locally for free on low-end hardware.
 
