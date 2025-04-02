@@ -10,7 +10,7 @@ The core hardware comprised a Nintendo Wii system, two complete sets of Raspberr
 
 In the playability analysis setup, the configuration was modified slightly to accommodate specialised measurement requirements. The Wii’s video output was split using a composite splitter, which enabled the signal to be simultaneously routed to the USB composite capture device attached to one Raspberry Pi and to an extra monitor. This additional monitor served to display the original, real-time composite output from the Wii, providing a baseline for latency comparisons. This additional display allowed for a direct, real-time view of the Wii’s output which doesn't go through the capture device. By comparing the real-time composite feed with the processed stream, the analysis could isolate and quantify any additional delays introduced during capture, encoding, network transmission, and decoding.
 
-\section{Playlability Analysis}
+\section{Playability Analysis}
 \label{sec:playability-analysis}
 
 The playability analysis takes into account 5 distinct parts of the system that
@@ -179,7 +179,7 @@ accelerometer values) into fixed-length packets and transmitting them over UDP,
 the system avoids the overhead associated with more complex data formats.
 
 Despite these efforts, some latency remains when compared to native Wii
-gameplay. As shown in the \nameref{sec:playability-analysis}, the system
+gameplay. As shown in \fullref{sec:playability-analysis}, the system
 has a total interaction lag of approximately 200milliseconds with the audiovisual
 streaming contributing 105 milliseconds of this. This latency is noticeable in
 fast-paced games but is still within a playable range.
@@ -255,10 +255,10 @@ original Wii experience. Furthermore, if the Wii Remote emulator was able to
 perfectly replicate the accelerometer data then there would be no need for
 calibration which would be the ideal solution.
 
-\section{Reflection and Future Work}
+\section{Reflection}
 
 \subsection{Evaluation of Objectives}
-As stated in the \nameref{chapter:introduction}, the key objectives of the project were:
+As stated in \fullref{chapter:introduction}, the key objectives of the project were:
 
 \begin{enumerate}
 	\item  Develop a system to capture and stream the Wii’s video and audio output to remote players.
@@ -270,8 +270,7 @@ Reflecting on the project in respect to these objectives, it is clear that the
 project successfully fulfils all three objectives. The system developed is
 capable of capturing and streaming the Wii’s video and audio output to remote
 players, relaying the Wii Remote’s controller data over a low-latency network
-connection, and has been evaluated in a real-world setting. The
-\nameref{sec:playability-analysis} demonstrates that the system is capable of
+connection, and has been evaluated in a real-world setting. Section~\ref{sec:playability-analysis} demonstrates that the system is capable of
 providing a playable experience for users, despite some limitations.
 
 % \subsection{Evaluation of Objectives}
@@ -347,52 +346,3 @@ services. However, many Nintendo Wii games have specific gameplay features that
 require local multiplayer or never supported online play -- such as Wii Sports.
 This project aims to address this limitation by enabling remote multiplayer
 experiences for games that were not designed for online play.
-
-\subsection{Future Work}
-
-\subsubsection{Enhanced Peripheral Integration}
-An avenue for future work involves expanding the system to support a broader
-range of Wii peripherals. For example, incorporating the nunchuck would not only
-enhance the gaming experience but also extend the system's compatibility with a
-wider variety of games that rely on additional input modalities. This expansion
-would require revisiting the current input relay architecture to integrate new
-input types and handling the unique sensor characteristics of each peripheral.
-Furthermore, the integration of these devices may necessitate revisions to the
-calibration routines and error-handling mechanisms, ensuring that the system
-processes the additional inputs with the same level of precision as the primary
-Wii Remote.
-
-\subsubsection{Scalability Testing}
-Future work should focus on scalability testing to evaluate how the data relay
-mechanisms perform when subjected to higher network loads. This entails setting
-up experiments that mimic real-world scenarios with multiple simultaneous
-connections, stressing the network to identify potential
-bottlenecks or points of failure in the project. By adopting robust simulation and testing
-methodologies, researchers could optimise the system’s architecture to better
-manage concurrent data streams and ensure that performance degrades gracefully
-under load. Ultimately, such testing will provide valuable insights into the
-system’s resilience and inform subsequent iterations of both software and
-hardware optimisations.
-
-\subsubsection{Latency Optimisation}
-Despite the progress made in reducing system latency, there is still room for
-improvement, especially for fast-paced gaming scenarios. Future work should
-explore advanced techniques for latency optimisation across all components of
-the system. This could involve a deeper investigation into the
-\texttt{WiimoteEmulator} fork and the input relay program to identify
-bottlenecks and streamline existing hot paths. Additionally, examining
-alternative RTP streaming parameters and exploring new network protocols might
-reveal opportunities to shave off critical milliseconds of delay.
-
-\subsubsection{Dynamic Calibration Techniques}
-Another important direction for future research is the development of dynamic
-calibration techniques for the accelerometer data. The current system relies on
-hand-tuned parameters, which, while effective in a controlled setting, may not
-perform optimally across different games or individual user preferences. Future
-work could focus on implementing adaptive algorithms that automatically adjust
-calibration settings in real time, using data gathered during gameplay. This
-might involve leveraging machine learning models to predict optimal calibration
-profiles based on user interactions or game-specific demands. By continuously
-refining the calibration process, the system can provide more accurate input
-replication, reducing discrepancies and further narrowing the performance gap
-between the emulated and original Wii experiences.

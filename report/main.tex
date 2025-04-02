@@ -103,6 +103,9 @@
     \addcontentsline{toc}{chapter}{#2}
 }
 
+% Ref with number and name
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} \nameref*{#1}}}
+
 \patchcmd{\subsubsection}{\bfseries}{\bfseries\boldmath }{}{}
 
 \RedeclareSectionCommand[beforeskip=0pt,afterskip=1cm]{chapter}

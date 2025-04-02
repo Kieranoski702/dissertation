@@ -1,14 +1,9 @@
 Questions for Tom:
 
-- I say that wii sport original had no online play. I know this is true but I cant find a source proving the negative. How can I source this/do I need to
-- Is requirements table correct format?
-- Should reference to figure 1.2 in design section be a duplication of the figure instead?
 - Do I need to add more on how I settled for config in section 7.3
-- I removed future work para in conclusion, is that okay?
 - In future work section of eval you say scalability testing with future work? comment what does this mean
 - What terms need defined?
 - Do I need a testing summary? 
-- List of tables and list of figures?
 
 Things to do:
 - Write a complete host script? (Maybe just user manual with current impl is fine?)
@@ -21,6 +16,20 @@ General diss stuff to do:
 - Build on the figure over time
 - More detail
 - More citations?
+
+
+What raspberry pi versions - use command from here: https://forums.raspberrypi.com/viewtopic.php?t=208710
+move future work to conclusion - moved but needs a re write
+
+Tom measured the latency of the capture device not the end to end 
+Need to measure decode and encode
+Say in each section saying the AV tramission is worse
+Make results into table
+Add to bluetooth by saing limiting factor always ninetndo bleutooth 2.0
+Change third figure. Have raspberyy pi point to figure
+
+Add pictures of the setup to appendix
+Make font size smaller in tables - I think the font is good now
 
 Old to do list:
 - Currently steering/acceleration is too extreme. Need to put the division scale in the python script to a higher value to make it easier to make precise tilts

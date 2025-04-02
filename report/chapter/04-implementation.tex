@@ -105,6 +105,7 @@ Table~\ref{tab:broadcast-args} explains the arguments used in the script in deta
 
 \begin{table}[!ht]
 	\centering
+\resizebox{\textwidth}{!}{
 	\begin{tabular}{|p{5cm}|p{10cm}|}
 		\hline
 		Argument                                        & Explanation                                                                                                          \\ \hline
@@ -126,7 +127,7 @@ Table~\ref{tab:broadcast-args} explains the arguments used in the script in deta
 		`-f rtp`                                        & Specifies the output format as RTP.                                                                                  \\ \hline
 		`-muxdelay 0`                                   & Sets the multiplexing delay to zero, ensuring immediate packetisation of the stream.                                 \\ \hline
 		`Output Destination: rtp://192.168.20.20:42423` & Designates the target IP address and port for the RTP stream transmission.                                           \\ \hline
-	\end{tabular}
+	\end{tabular}}
 	\caption{\texttt{broadcast-rtp.sh} Argument Explanations}
 	\label{tab:broadcast-args}
 
@@ -155,6 +156,7 @@ processing.
 
 \begin{table}[!ht]
 	\centering
+\resizebox{\textwidth}{!}{
 	\begin{tabular}{|p{5cm}|p{10cm}|}
 		\hline
 		Argument                            & Explanation                                                                                                             \\ \hline
@@ -170,7 +172,7 @@ processing.
 		`-vf setpts=0`                      & Resets presentation timestamps to help maintain sync in a low-latency context.                                          \\ \hline
 		`-sync ext`                         & Synchronises playback using an external clock for accurate timing with the RTP stream.                                  \\ \hline
 		`Input File: rtp-h264.sdp`          & Provides the SDP file that describes the RTP stream parameters, essential for interpreting the incoming data correctly. \\ \hline
-	\end{tabular}
+	\end{tabular}}
 	\caption{\texttt{play-rtp.sh} Argument Explanations}
 	\label{tab:play-args}
 
@@ -327,7 +329,7 @@ Latency is a critical performance metric when determining the playability of vid
 
 \end{itemize}
 
-A shown in the \nameref{sec:playability-analysis}, the latency introduced by the emulator is minimal, with the majority of latency stemming from the video streaming component.
+A shown in \fullref{sec:playability-analysis}, the latency introduced by the emulator is minimal, with the majority of latency stemming from the video streaming component.
 
 \section{Automation of Device Setup}
 

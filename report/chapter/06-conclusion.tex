@@ -35,6 +35,55 @@ supported games. Manual accelerometer calibration also posed a challenge, as the
 fixed parameters did not adapt dynamically to different game requirements or
 user preferences.
 
+\section{Future Work}
+
+\subsection{Enhanced Peripheral Integration}
+An avenue for future work involves expanding the system to support a broader
+range of Wii peripherals. For example, incorporating the nunchuck would not only
+enhance the gaming experience but also extend the system's compatibility with a
+wider variety of games that rely on additional input modalities. This expansion
+would require revisiting the current input relay architecture to integrate new
+input types and handling the unique sensor characteristics of each peripheral.
+Furthermore, the integration of these devices may necessitate revisions to the
+calibration routines and error-handling mechanisms, ensuring that the system
+processes the additional inputs with the same level of precision as the primary
+Wii Remote.
+
+\subsection{Scalability Testing}
+Future work should focus on scalability testing to evaluate how the data relay
+mechanisms perform when subjected to higher network loads. This entails setting
+up experiments that mimic real-world scenarios with multiple simultaneous
+connections, stressing the network to identify potential
+bottlenecks or points of failure in the project. By adopting robust simulation and testing
+methodologies, researchers could optimise the system’s architecture to better
+manage concurrent data streams and ensure that performance degrades gracefully
+under load. Ultimately, such testing will provide valuable insights into the
+system’s resilience and inform subsequent iterations of both software and
+hardware optimisations.
+
+\subsection{Latency Optimisation}
+Despite the progress made in reducing system latency, there is still room for
+improvement, especially for fast-paced gaming scenarios. Future work should
+explore advanced techniques for latency optimisation across all components of
+the system. This could involve a deeper investigation into the
+\texttt{WiimoteEmulator} fork and the input relay program to identify
+bottlenecks and streamline existing hot paths. Additionally, examining
+alternative RTP streaming parameters and exploring new network protocols might
+reveal opportunities to shave off critical milliseconds of delay.
+
+\subsection{Dynamic Calibration Techniques}
+Another important direction for future research is the development of dynamic
+calibration techniques for the accelerometer data. The current system relies on
+hand-tuned parameters, which, while effective in a controlled setting, may not
+perform optimally across different games or individual user preferences. Future
+work could focus on implementing adaptive algorithms that automatically adjust
+calibration settings in real time, using data gathered during gameplay. This
+might involve leveraging machine learning models to predict optimal calibration
+profiles based on user interactions or game-specific demands. By continuously
+refining the calibration process, the system can provide more accurate input
+replication, reducing discrepancies and further narrowing the performance gap
+between the emulated and original Wii experiences.
+
 % Looking ahead, several promising avenues exist for further refining and
 % expanding the system. Enhancing peripheral integration is a clear priority; by
 % incorporating additional input devices such as the nunchuck and other motion

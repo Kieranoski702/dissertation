@@ -57,7 +57,14 @@ Modularity was a guiding principle in the relay’s design. By mapping all input
 \section{Wiimote Emulator}
 
 \subsection{Leveraging Established Codebase}
-Instead of developing a Wii Remote emulator from scratch, the project builds upon the \texttt{WiimoteEmulator} project. Building a new Wii Remote emulator would have been too time-consuming and risked introducing bugs. One benefit of building an emulator from scratch would be the ability to minimise the latency between the emulator and the Wii console -- something that the \texttt{WiimoteEmulator} project didn't focus on. However, the latency introduced by the emulator doesn't make the games unplayable, as shown in the \nameref{sec:playability-analysis} section. Adapting an existing project allowed for a focus on design improvements rather than foundational re-implementation.
+Instead of developing a Wii Remote emulator from scratch, the project builds
+upon the \texttt{WiimoteEmulator} project. Building a new Wii Remote emulator
+would have been too time-consuming and risked introducing bugs. One benefit of
+building an emulator from scratch would be the ability to minimise the latency
+between the emulator and the Wii console -- something that the
+\texttt{WiimoteEmulator} project didn't focus on. However, the latency
+introduced by the emulator is already low compared to other parts of the system, as shown in \fullref{sec:playability-analysis}. Adapting an existing project allowed
+for a focus on design improvements rather than foundational re-implementation.
 
 \subsection{Enhanced Input Simulation}
 Extensions to the emulator support streaming IR and accelerometer data over UDP. This feature enables the remote player’s inputs to be accurately reflected in the Wii console’s gameplay. The original \texttt{WiimoteEmulator} project is able to emulate IR and accelerometer data but only through a mouse and keyboard interface. In addition, the original project calculates all the IR and accelerometer data in small movements, i.e. there is no way to quickly snap from one end of the screen to the other. Thus, the improvements to the \texttt{WiimoteEmulator} project centre around fixing these shortcomings.

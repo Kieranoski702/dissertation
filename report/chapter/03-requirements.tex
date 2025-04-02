@@ -5,14 +5,15 @@
 
 \begin{table}[!ht]
     \centering
-    \begin{tabular}{|p{1cm}|p{3cm}|p{5cm}|p{6cm}|}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{|p{1cm}|p{3cm}|p{6cm}|p{7cm}|}
       \hline
         Req. ID & Title & Description & Rationale/Justification \\ \hline
       FR-01 & Video and Audio Capture and Streaming & Capture the Wii’s video and audio outputs and stream them to remote players with minimal latency. & Enable remote players to experience the game in real-time by providing audiovisual data. If the remote user could not see or hear the game, the project would be non-functional. \\ \hline
       FR-02 & Controller Input Relay & Capture Wii Remote inputs -- including motion data and button presses -- and transmit them over a low-latency network connection. & Allow remote players to interact with the game in real-time by relaying controller inputs, without which the project would be non-functional. \\ \hline
       FR-03 & Wii Remote Emulation & Emulate the remote user's Wii Remote inputs through a local Bluetooth connection to the Wii console. & Enable remote players to control the game as if they were physically present by emulating controller inputs. Without this feature, the project would be non-functional. \\ \hline
       FR-04 & Performance & Operate under strict low-latency conditions by minimising delay and jitter using efficient processing and optimised data streaming protocols. & Ensure a responsive and immersive gaming experience by reducing latency and maintaining consistent performance, which is crucial for real-time gameplay. If latency is too high, the game will be unplayable. \\ \hline
-    \end{tabular}
+    \end{tabular}}
     \caption{Functional Requirements}
     \label{tab:functional-requirements}
 \end{table}
@@ -22,13 +23,14 @@
 
 \begin{table}[!ht]
     \centering
-    \begin{tabular}{|p{1cm}|p{3cm}|p{5cm}|p{6cm}|}
+\resizebox{\textwidth}{!}{
+    \begin{tabular}{|p{1cm}|p{3cm}|p{6cm}|p{7cm}|}
     \hline
         Req. ID & Title & Description & Rationale/Justification \\ \hline
         NFR-01 & Reliability and Robustness & Tolerate variations in network quality while maintaining continuous and stable operation under sub-optimal conditions. & Enhance system dependability by accommodating fluctuations in network performance, which is essential for uninterrupted gaming experiences. \\ \hline
         NFR-02 & Accessibility & Provide an intuitive interface and a straightforward setup process that enables easy connectivity and configuration without extensive technical effort. & Increase usability and lower technical barriers, allowing a broader range of users to enjoy the gaming experience without specialised assistance. \\ \hline
         NFR-03 & Evaluation & Conduct comprehensive testing in real-world environments and gather both quantitative performance metrics. & Validate overall system performance and quality through systematic assessment, facilitating informed decisions for iterative improvements and refinement. \\ \hline
-    \end{tabular}
+    \end{tabular}}
     \caption{Non-Functional Requirements}
     \label{tab:non-functional-requirements}
 \end{table}
