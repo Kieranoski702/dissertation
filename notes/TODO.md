@@ -17,27 +17,13 @@ General diss stuff to do:
 - More detail
 - More citations?
 
-
-What raspberry pi versions - use command from here: https://forums.raspberrypi.com/viewtopic.php?t=208710
-move future work to conclusion - moved but needs a re write
-
-Tom measured the latency of the capture device not the end to end 
-Need to measure decode and encode
-Say in each section saying the AV tramission is worse
-Make results into table
-Add to bluetooth by saing limiting factor always ninetndo bleutooth 2.0
-Change third figure. Have raspberyy pi point to figure
-
 Add pictures of the setup to appendix
 Make font size smaller in tables - I think the font is good now
 
 Old to do list:
 - Currently steering/acceleration is too extreme. Need to put the division scale in the python script to a higher value to make it easier to make precise tilts
-- Reduce emulator latency 
 
 - Do testing and validation and update/uncomment section 5.7 accordingly?
-
-- Add network latency and gather results. Basically do playability testing and add to eval chapter
 
 - Design trade offs section?
 - Add a testing summary to appendix?

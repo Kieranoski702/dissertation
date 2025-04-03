@@ -98,7 +98,7 @@ over the Real-time Transport Protocol (RTP).
 The \texttt{broadcast-rtp.sh} script runs the following command:
 
 \begin{lstlisting}[language=bash]
-  ffmpeg -max_delay 0 -max_probe_packets 1 -f v412 -framerate 25 -video_size 720x576 -threads 1 -i /dev/video0 -vcodec libx264 -pix_fmt:v yuv420p -g:v 1 -preset ultrafast -tune zerolatency -crf 17 -max_delay 0 -fflags +nobuffer -flags low_delay -f rtp -muxdelay 0 rtp://192.168.20.20:42423
+  ffmpeg -max_delay 0 -max_probe_packets 1 -f v4l2 -framerate 25 -video_size 720x576 -threads 1 -i /dev/video0 -vcodec libx264 -pix_fmt:v yuv420p -g:v 1 -preset ultrafast -tune zerolatency -crf 17 -max_delay 0 -fflags +nobuffer -flags low_delay -f rtp -muxdelay 0 rtp://192.168.20.20:42423
 \end{lstlisting}
 
 Table~\ref{tab:broadcast-args} explains the arguments used in the script in detail. See the official \texttt{ffmpeg} documentation for more information\cite{ffmpegDocumentation}. Notably, the script uses the \texttt{-preset ultrafast} option to minimise processing time and the \linebreak \texttt{-tune zerolatency} option to optimise the encoder for real-time transmission which reduces latency. It also uses the \texttt{-crf 17} option which sets the constant rate factor to 17. Constant rate factor (CRF) is a quality-based variable bitrate control method that adjusts the quality of the video stream while maintaining a constant bitrate. In the H.264 codec, the range of the CRF scale is 0–51, where 0 is lossless, 23 is the default, and 51 is worst quality possible. A lower value generally leads to higher quality. A CRF value of 17 or 18 is essentially visually lossless or nearly so\cite{ffmpegEncodeH264x2013}. Keeping the default CRF value of 23, along with the other latency reducing settings, results in video quality that is not acceptable as text and detail become illegible so to increase the quality, the system uses a CRF value of 17.
@@ -111,7 +111,7 @@ Table~\ref{tab:broadcast-args} explains the arguments used in the script in deta
 		Argument                                        & Explanation                                                                                                          \\ \hline
 		`-max\_delay 0`                                 & Processes incoming packets immediately without waiting for additional data, reducing buffering delay.                \\ \hline
 		`-max\_probe\_packets 1`                        & Limits probing to one packet to accelerate stream setup.                                                             \\ \hline
-		`-f v412`                                       & Specifies the input format provided by the video capture device; ensures compatibility with the incoming video data. \\ \hline
+		`-f v4l2`                                       & Specifies the input format provided by the video capture device; ensures compatibility with the incoming video data. \\ \hline
 		`-framerate 25`                                 & Sets the frame rate to 25 fps to balance smooth playback and processing load.                                        \\ \hline
 		`-video\_size 720x576`                          & Defines the video resolution at 720x576 pixels.                                                                      \\ \hline
 		`-threads 1`                                    & Restricts encoding to a single thread for consistent low-latency performance.                                        \\ \hline
@@ -329,7 +329,7 @@ Latency is a critical performance metric when determining the playability of vid
 
 \end{itemize}
 
-A shown in \fullref{sec:playability-analysis}, the latency introduced by the emulator is minimal, with the majority of latency stemming from the video streaming component.
+A shown in \fullref{sec:playability-analysis}, the latency introduced by the emulator is minimal, with the majority of latency stemming from hardware delay introduced by the composite capture device.
 
 \section{Automation of Device Setup}
 
