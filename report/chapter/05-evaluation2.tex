@@ -37,18 +37,25 @@ The second test evaluated the performance of the Wii Remote emulator itself. By
 incorporating a \texttt{gettimeofday} call in the C code immediately upon receiving an
 input from the network and again right after dispatching the corresponding
 emulated input, the latency intrinsic to the emulation process was determined and output to the terminal.
-The results, shown in Listing~\ref{lst:emulator}, indicate that the average
+The results, shown in Table~\ref{table:emulator}, indicate that the average
 latency for IR data was 1511 microseconds (1.511 milliseconds), while the
 accelerometer and button data exhibited average delays of 1498 and 5388
 microseconds (1.498 and 5.388 milliseconds), respectively. These measurements
 illustrate that the emulation system introduces only minimal delays.
 
 
-\begin{lstlisting}[caption={Wii Remote Emulator Latency Results}, label=lst:emulator, mathescape=true,]
-  IR:         average 1511 $\mu$s (1326 samples)
-  Accelerometer: average 1498 $\mu$s (1457 samples)
-  Button:     average 5388 $\mu$s (25 samples)
-\end{lstlisting}
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+        Input Type & Average Latency (µs) & Samples \\ \hline
+        IR & 1511 & 1326 \\ \hline
+        Accelerometer & 1498 & 1457 \\ \hline
+        Button & 5388 & 25 \\ \hline
+    \end{tabular}
+    \caption{Wii Remote Emulator Latency Results}
+    \label{table:emulator}
+\end{table}
 
 \subsection{Input Relay System Latency}
 
@@ -57,16 +64,24 @@ system. Similar in concept to the emulator test, this measurement was conducted
 by recording timestamps using Python’s \texttt{time.monotonic()} function immediately
 before an input was processed and again right after it was sent over the UDP
 socket then printing the results to the terminal. The results, shown in
-Listing~\ref{lst:inputrelay}, show that the latency of the input relay system is
+Table~\ref{table:inputrelay}, show that the latency of the input relay system is
 negligible, with average delays of 18, 13, and 18 microseconds for the
 accelerometer, IR, and button inputs, respectively. These results confirm that the input
 relay mechanism imposes an extremely minor delay.
 
-\begin{lstlisting}[caption={Input Relay System Latency Results}, label=lst:inputrelay, mathescape=true]
-INFO:wiimote_streamer:  Accelerometer: average 18 $\mu$s (3389 samples)
-INFO:wiimote_streamer:  IR:            average 13 $\mu$s (3058 samples)
-INFO:wiimote_streamer:  Button:        average 18 $\mu$s (26 samples)
-\end{lstlisting}
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|l|}
+    \hline
+        Input Type & Average Latency (µs) & Samples \\ \hline
+        Accelerometer & 18 & 3389 \\ \hline
+        IR & 13 & 3058 \\ \hline
+        Button & 18 & 26 \\ \hline
+    \end{tabular}
+    \caption{Input Relay System Latency Results}
+    \label{table:inputrelay}
+
+  \end{table}
 
 \subsection{Network Latency}
 
@@ -74,19 +89,26 @@ The fourth test concentrated on the network latency between the host and client
 machines. In this evaluation, the Raspberry Pis were connected directly via
 Ethernet within a closed network, a configuration that minimises external
 interference. The command \texttt{ping -c 100 -i 0.2 192.168.20.10} was executed to
-collect latency statistics. The analysis, shown in Listing~\ref{lst:network},
+collect latency statistics. The analysis, shown in Table~\ref{table:network},
 revealed an average round-trip time (RTT) of 0.203 milliseconds as well as a
 minimum and maximum RTT of 0.190 and 0.289 milliseconds, respectively. The results
 demonstrate that the network latency of the system is very low. It is important to note that while these values demonstrate extremely low latency on a
 dedicated network, typical home networks experience latencies in
 the 30–100ms range on average\cite{latencySurvey}.
 
-\begin{lstlisting}[caption={Network Latency Results}, label=lst:network]
---- 192.168.20.10 ping statistics ---
-100 packets transmitted, 100 received, 0% packet loss, time 20195ms
-rtt min/avg/max/mdev = 0.190/0.203/0.289/0.010 ms
-\end{lstlisting}
-
+\begin{table}[!ht]
+    \centering
+    \begin{tabular}{|l|l|}
+    \hline
+        Metric & Value (ms) \\ \hline
+        Min RTT & 0.190 \\ \hline
+        Avg RTT & 0.203 \\ \hline
+        Max RTT & 0.289 \\ \hline
+        Mdev & 0.010 \\ \hline
+    \end{tabular}
+    \caption{Network Latency Results}
+    \label{table:network}
+\end{table}
 
 
 \subsection{Bluetooth Latency:}
@@ -152,7 +174,7 @@ Manual tests refined the audiovisual streaming component by evaluating each para
 
 Initially, the adoption of options such as \texttt{-preset ultrafast} and \linebreak \texttt{-tune zerolatency} resulted in the most significant reduction in noticeable latency. However, these settings also led to a decline in video quality, introducing compression artefacts and reduced image clarity that hampered the overall viewing experience. In contrast, incorporating the \texttt{-crf 17} parameter improved the visual quality substantially. Although it introduced a slight increase in the latency, this trade-off proved acceptable as the added delay was barely perceptible, while the quality enhancement ensured that details remained crisp and legible during fast-paced gameplay.
 
-This iterative testing and fine-tuning process ultimately converged on the final set of streaming parameters, shown in section~\ref{sec:audio-video-streaming}, that best balanced low latency with high video quality. The final configuration represents a carefully considered compromise, ensuring that the audiovisual streaming pipeline delivers a responsive and visually satisfactory experience for remote gameplay.
+This iterative testing and fine-tuning process ultimately converged on the final set of streaming parameters, shown in \fullref{sec:audio-video-streaming}, that best balanced low latency with high video quality. The final configuration represents a carefully considered compromise, ensuring that the audiovisual streaming pipeline delivers a responsive and visually satisfactory experience for remote gameplay.
 
 
 \subsubsection{Latency}
@@ -228,7 +250,7 @@ the cumulative delay introduced at various stages, including video capture,
 encoding, network transmission, decoding, input processing, and emulation.
 However, the largest contributor to latency is the audiovisual streaming
 pipeline, which accounts for approximately 105 milliseconds of the total
-interaction lag as shown in section~\ref{sec:playability-analysis}. To further
+interaction lag as shown in \fullref{sec:playability-analysis}. To further
 mitigate latency, future work could explore more advanced compression
 algorithms, refine the UDP transmission pipeline, or experiment with alternative
 low-latency streaming protocols. Additionally, implementing predictive buffering
@@ -270,7 +292,7 @@ Reflecting on the project in respect to these objectives, it is clear that the
 project successfully fulfils all three objectives. The system developed is
 capable of capturing and streaming the Wii’s video and audio output to remote
 players, relaying the Wii Remote’s controller data over a low-latency network
-connection, and has been evaluated in a real-world setting. Section~\ref{sec:playability-analysis} demonstrates that the system is capable of
+connection, and has been evaluated in a real-world setting. \fullref{sec:playability-analysis} demonstrates that the system is capable of
 providing a playable experience for users, despite some limitations.
 
 % \subsection{Evaluation of Objectives}
