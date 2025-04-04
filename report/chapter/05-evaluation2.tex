@@ -24,22 +24,24 @@ the moment the signal left the Wii, through capture by the composite device,
 encoding on the host machine, network transmission, decoding by the client
 machine, and finally its display on the client monitor. The delay from the composite
 capture device is a hardware delay meaning that it is intrinsic to the
-capture device and cannot be optimised or improved.
+capture device and cannot be optimised or improved unless more advanced hardware is
+used.
 
 To determine the hardware delay form the capture device,
 both the host monitor and the additional monitor (showing the direct Wii
 output) were recorded simultaneously. Analysis of the recordings revealed a
 consistent lag of 21 frames between the two displays. Given that the video was
-captured at 25 frames per second and played back at one-eighth speed, this delay
-corresponds to approximately $(1/25 \times 1/8 \times 1000) \times 21 = 105$ milliseconds of lag. As this delay is intrinsic to the capture device, it cannot be optimised away and is the theoretical minimum latency of the system.
+captured at 30 frames per second and played back at one-eighth speed, this delay
+corresponds to approximately $(1/30 \times 1/8 \times 1000) \times 19 = 79.166$ milliseconds of lag. As this delay is intrinsic to the capture device, it cannot be optimised away and is the theoretical minimum latency of the current system.
 
-To determine the total latency of the audiovisual transmission, a similar experiment can be conducted but the client monitor is used in place of the host monitor. Analysing this recording revealed a consistent lag of 24 frames between the client monitor and the additional monitor showing the direct Wii output. Given that the video was captured at 25 frames per second and played back at one-eighth speed, this delay corresponds to approximately $(1/25 \times 1/8 \times 1000) \times 24 = 120$ milliseconds of lag.
+To determine the total latency of the audiovisual transmission, a similar experiment can be conducted but the client monitor is used in place of the host monitor. Analysing this recording revealed a consistent lag of 24 frames between the client monitor and the additional monitor showing the direct Wii output. Given that the video was captured at 30 frames per second and played back at one-eighth speed, this delay corresponds to approximately $(1/30 \times 1/8 \times 1000) \times 23 = 95.833$ milliseconds of lag.
 
-An estimate of the combined encoding and decoding delay can be found by subtracting the hardware and network delay from the total audiovisual latency. Subtracting the hardware delay of 105 milliseconds and the network delay of 0.203 milliseconds (as shown in Table~\ref{table:network}) gives an
-estimate of 14.797 milliseconds for the encode and decode delay combined.
+An estimate of the combined encoding and decoding delay can be found by subtracting the hardware and network delay from the total audiovisual latency. Subtracting the hardware delay of 79.166 milliseconds and the network delay of 0.203 milliseconds (as shown in Table~\ref{table:network}) gives an
+estimate of 16.464 milliseconds for the encode and decode delay combined. Given a theoretical perfect capture
+device, this latency would be the minimum audiovisual latency of the current implementation.
 
 This analysis demonstrates that the hardware delay of the composite capture device is the largest
-contributor to the audiovisual latency, accounting for 105 milliseconds of the total. Thus, most of the audiovisual latency is not caused by the implementation of this project but rather by the hardware used.
+contributor to the audiovisual latency, accounting for 79.166 milliseconds of the total. Thus, most of the audiovisual latency is not caused by the implementation of this project but rather by the hardware used. By improving the hardware used, the audiovisual latency could be significantly reduced
 
 \subsection{Wii Remote Emulator Latency}
 
@@ -148,8 +150,8 @@ summing the latencies of each part of the system. In this setup, the total inter
   \text{Total Interaction Lag} &= \text{Audiovisual Latency} + \text{Wii Remote Emulator Latency} \\
   &+ \text{Input Relay System Latency} + \text{Network Latency} \\
   &+ (\text{Bluetooth Latency} * 2) \\
-  &= 120 + 5.388 + 0.018 + 0.203 + (35 * 2) \\
-  &= 195.609 \text{ milliseconds}
+  &= 95.833 + 5.388 + 0.018 + 0.203 + (35 * 2) \\
+  &= 171.442 \text{ milliseconds}
 \end{align*}
 
 This total is assuming the worst case (button press) for the Wii Remote emulator
@@ -159,14 +161,14 @@ and the client machine as well as between the Wii Remote emulator running on the
 host machine and the Wii Console. The network lag is only counted once as the
 Audiovisual latency includes the network latency on the trip back to the client
 machine. Note that using a typical home network with latencies in the 30-100ms
-range would increase the total interaction lag to 255-395ms. 195 milliseconds is
+range would increase the total interaction lag to 201-271ms. 171 milliseconds is
 within the range of playable latency for gaming\cite{latency_playable}, but it is
 noticeable and can negatively affect the user experience, especially in fast-paced games\cite{latency_bad}.
 
 It is clear that the audiovisual delay is the largest contributor to the overall
-interaction lag, accounting for 120 milliseconds of the total. However, as
+interaction lag, accounting for 95.833 milliseconds of the total. However, as
 established in Subsection~\ref{subsec:latency-audiovisual}, this delay is
-primarily due to the 105 milliseconds of hardware delay introduced by the
+primarily due to the 79.166 milliseconds of hardware delay introduced by the
 composite capture device. In addition, the second largest contributor to the
 total interaction lag is the Bluetooth latency, which adds
 approximately 70 milliseconds of latency. Both of these delays are intrinsic to the system
@@ -229,8 +231,8 @@ the system avoids the overhead associated with more complex data formats.
 
 Despite these efforts, some latency remains when compared to native Wii
 gameplay. As shown in \fullref{sec:playability-analysis}, the system has a total
-interaction lag of approximately 195 milliseconds with hardware delay
-contributing 105 milliseconds of this. This latency is noticeable in fast-paced
+interaction lag of approximately 171.442 milliseconds with hardware delay
+contributing 79.166 milliseconds of this. This latency is noticeable in fast-paced
 games but is still within a playable range.
 
 \section{Limitations}
@@ -275,7 +277,7 @@ tuned streaming settings, and emulation improvements -- a noticeable delay
 persists when compared to native Wii gameplay. This residual latency arises from
 the cumulative delay introduced at various stages, including video capture,
 encoding, network transmission, decoding, input processing, and emulation.
-However, the largest contributor to latency is the hardware delay introduced by the composite capture device, which accounts for approximately 105 milliseconds of the total
+However, the largest contributor to latency is the hardware delay introduced by the composite capture device, which accounts for approximately 79.166 milliseconds of the total
 interaction lag as shown in \fullref{sec:playability-analysis}. To further
 mitigate latency, future work could explore more advanced compression
 algorithms, refine the UDP transmission pipeline, or experiment with alternative
