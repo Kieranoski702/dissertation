@@ -1,5 +1,5 @@
 ---
-title: "CS4099 - Wii over IP - Interim Demo"
+title: "CS4099 - Wii over IP - Final Demo"
 author: "Kieran Fowlds - 210018092"
 format:
   revealjs:
@@ -11,35 +11,34 @@ embed-resources: true
 
 ## Problem and Motivation 
 
-- The Nintendo Wii remains a beloved console due to its innovative motion controls and engaging local multiplayer experiences.
-- However, modern gaming has shifted toward online play, making it difficult to recreate traditional in-person multiplayer sessions.
-- Gathering physically for split-screen Wii gaming poses logistical challenges in today's era of remote connectivity.
+- The Nintendo Wii remains a beloved console. However, Nintendo discontinued online services for the Wii in 2014.
+- Other projects have recreated the Wii’s online services, but they are limited to specific online only game modes and do not support local multiplayer titles and gamemodes.
 - This project aims to virtualise the Wii’s input and output interfaces, enabling remote players to experience local multiplayer as if they were in the same room.
 
-## Main challenges
+## Main objectives
 
-- The two core challenges:
-    - Low-latency video/audio streaming to ensure smooth and synchronised gameplay.
-    - Wiimote input relay over a network, preserving motion-based controls with minimal delay.
-- Successfully implementing this system will extend the lifespan of the Wii and offer a model for virtualising other retro multiplayer experiences
+1. Capture the Wii’s video and audio outputs and stream them to remote players with minimal latency.
 
-## What I have done so far
+2. Capture remote user Wii Remote inputs -- including motion data and button presses – and transmit them over a low-latency network connection.
 
-- Written scripts that allow for low latency video streaming of the Wii display to other raspberry pis
-- Setup the raspberry pis to interface with the Wiimote so that it can act as a mouse and keyboard input
-- Researched and configured a Wii remote emulator so that the host pi can emulate remote pi Wii remote inputs
+3. Emulate the remote user’s Wii Remote inputs through a local Bluetooth connection to the Wii console.
 
-## What still needs to be done
+## Design Overview
 
-- Test and possibly fix the latency of the Wii remote emulator as it currently looks like it will be the largest bottleneck for low latency performance
-- Write a program that can connect all the pieces together. We need to send the Wii remote inputs from remote pis to the host pi then translate those inputs into emulated Wii remote inputs
-- Scientifically evaluate the latency and "playability" of the system
+![](advanced_intro.jpg)
+
+## Results
+
+- The project successfully allows remote players to participate in local multiplayer Wii games.
+- The overall latency is around 170ms, which is acceptable but not great for most games. 
+- However, most of this latency is hardware delay from the Video Capture Card which could be reduced with more expensive hardware.
+- Other limitations remain but overall the project has achieved its goals.
+
 
 ::: {.notes}
 This is a note
 :::
 
-
-<!-- ![](logging_output.png) -->
-
 # Questions?
+
+# Demo Time!
